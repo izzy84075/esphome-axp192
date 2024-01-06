@@ -272,7 +272,7 @@ bool AXP192Component::GetBatState()
 bool AXP192Component::GetChargingState()
 {
     // reading 0x00 bit 6
-    if( (Read8bit(0x00) >> 5) & 0x01 )
+    if( (Read8bit(0x01) >> 5) & 0x01 )
         return true;
     else
         return false;
