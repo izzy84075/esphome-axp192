@@ -2,7 +2,7 @@
 
 #include <map>
 #include <unordered_map>
-#include "../axp192_component.h"
+#include "../axp192.h"
 #include "esphome/components/output/float_output.h"
 #include "esphome/core/component.h"
 
