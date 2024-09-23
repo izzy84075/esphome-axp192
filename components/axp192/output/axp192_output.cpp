@@ -50,6 +50,9 @@ void AXP192Output::write_state(float state) {
         this->get_parent()->configure_ldoio0_voltage(state);
       }
       break;
+    case OutputPin::OUTPUT_BACKLIGHT:
+      this->get_parent()->set_backlight(state);
+      break;
     default:
       break;
   }

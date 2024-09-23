@@ -40,6 +40,7 @@ CONF_OUTPUT_LDO3 = 'ldo3'
 CONF_OUTPUT_DCDC1 = 'dcdc1'
 CONF_OUTPUT_DCDC3 = 'dcdc3'
 CONF_OUTPUT_LDOIO0 = 'ldoio0'
+CONF_OUTPUT_BACKLIGHT = 'backlight'
 
 output_pin = axp192_ns.enum('OutputPin', is_class=True)
 OUTPUT_PIN = {
@@ -48,6 +49,7 @@ OUTPUT_PIN = {
     CONF_OUTPUT_DCDC1: output_pin.OUTPUT_DCDC1,
     CONF_OUTPUT_DCDC3: output_pin.OUTPUT_DCDC3,
     CONF_OUTPUT_LDOIO0: output_pin.OUTPUT_LDOIO0,
+    CONF_OUTPUT_BACKLIGHT: output_pin.OUTPUT_BACKLIGHT,
 }
 
 VoffVoltage = axp192_ns.enum('VoffVoltage', is_class=True)
@@ -198,8 +200,6 @@ def to_code(config):
     cg.add(var.set_ldoio0_voltage(config[CONF_LDOIO0_VOLTAGE] * 1000))
     cg.add(var.set_ldoio0_mode(config[CONF_LDOIO0_MODE]))
     
-
-
 @automation.register_action(
     'axp192.power_off',
     PowerOffAction,

@@ -141,7 +141,7 @@ enum class RegisterLocations : uint8_t {
   BATTERY_COULUMB_COUTER_CONTROL = 0xB8
 };
 
-enum class OutputPin : uint8_t { OUTPUT_LDO2, OUTPUT_LDO3, OUTPUT_DCDC1, OUTPUT_DCDC3, OUTPUT_LDOIO0 };
+enum class OutputPin : uint8_t { OUTPUT_LDO2, OUTPUT_LDO3, OUTPUT_DCDC1, OUTPUT_DCDC3, OUTPUT_LDOIO0, OUTPUT_BACKLIGHT };
 
 // 32bit int - <reg 00><reg 1> MSB -> LSB
 
