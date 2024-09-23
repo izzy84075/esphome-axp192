@@ -10,7 +10,7 @@ namespace esphome {
 namespace axp192 {
 
 // NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
-class Axp192Output : public Parented<Axp192Component>, public output::FloatOutput, public Component {
+class AXP192Output : public Parented<AXP192Component>, public output::FloatOutput, public Component {
  public:
   void dump_config() override;
   void setup() override;

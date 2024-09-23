@@ -7,14 +7,14 @@ namespace esphome {
 namespace axp192 {
 
 
-void Axp192Output::dump_config() {
+void AXP192Output::dump_config() {
   ESP_LOGCONFIG(this->get_component_source(), "Published Output:");
   LOG_FLOAT_OUTPUT(this);
 }
 
-void Axp192Output::setup() { this->get_parent()->register_output(this->pin_, this); }
+void AXP192Output::setup() { this->get_parent()->register_output(this->pin_, this); }
 
-void Axp192Output::write_state(float state) {
+void AXP192Output::write_state(float state) {
   switch (this->pin_) {
     case OutputPin::OUTPUT_LDO2:
       this->get_parent()->configure_ldo2(state != 0.0f);

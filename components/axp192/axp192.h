@@ -8,7 +8,7 @@
 
 namespace esphome {
 namespace axp192 {
-  class Axp192Output;
+  class AXP192Output;
 
 enum AXP192Model {
   AXP192_M5STICKC = 0,

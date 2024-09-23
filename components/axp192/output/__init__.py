@@ -2,11 +2,11 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import output
 from esphome.const import CONF_OUTPUT, CONF_ID, CONF_VOLTAGE
-from .. import axp192_ns, Axp192Component, CONF_AXP192_ID, OUTPUT_PIN
+from .. import axp192_ns, AXP192Component, CONF_AXP192_ID, OUTPUT_PIN
 
 DEPENDENCIES = ["axp192", "output"]
 
-Axp192Output = axp192_ns.class_("Axp192Output", output.FloatOutput)
+AXP192Output = axp192_ns.class_("AXP192Output", output.FloatOutput)
 
 CONFIG_SCHEMA = output.FLOAT_OUTPUT_SCHEMA.extend(
     {
