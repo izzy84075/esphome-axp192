@@ -17,8 +17,8 @@
 #endif
 
 #include "esphome/core/log.h"
-#include "esp_sleep.h"
-#include <Esp.h>
+//#include "esp_sleep.h"
+//#include <Esp.h>
 
 namespace esphome {
 namespace axp192 {
