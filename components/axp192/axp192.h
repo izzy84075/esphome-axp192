@@ -376,8 +376,8 @@ private:
 #endif
 
 protected:
-    sensor::Sensor *batterylevel_sensor_;
-    binary_sensor::BinarySensor *charging_sensor_;
+    //sensor::Sensor *batterylevel_sensor_;
+    //binary_sensor::BinarySensor *charging_sensor_;
     float brightness_{1.0f};
     float curr_brightness_{-1.0f};
     AXP192Model model_;
