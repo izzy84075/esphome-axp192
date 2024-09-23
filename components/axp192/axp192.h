@@ -6,6 +6,9 @@
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/i2c/i2c.h"
 
+#include <map>
+#include <unordered_map>
+
 namespace esphome {
 namespace axp192 {
   class AXP192BinarySensor;
@@ -358,6 +361,15 @@ protected:
     float brightness_{1.0f};
     float curr_brightness_{-1.0f};
     AXP192Model model_;
+
+  #ifdef USE_SENSOR
+    std::map<SensorType, AXP192Sensor *> sensors_{};
+  #endif
+
+  #ifdef USE_BINARY_SENSOR
+    std::map<MonitorType, AXP192BinarySensor *> monitors_{};
+    std::map<IrqType, AXP192BinarySensor *> irqs_{};
+  #endif
 
     #ifdef USE_OUTPUT
     std::map<OutputPin, AXP192Output *> output_control_{};
