@@ -51,7 +51,7 @@ void AXP192Output::write_state(float state) {
       }
       break;
     case OutputPin::OUTPUT_BACKLIGHT:
-      this->get_parent()->set_backlight(state);
+      this->get_parent()->set_brightness(state);
       break;
     default:
       break;
