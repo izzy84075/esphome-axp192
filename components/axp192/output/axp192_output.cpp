@@ -17,10 +17,10 @@ void AXP192Output::setup() { this->get_parent()->register_output(this->pin_, thi
 void AXP192Output::write_state(float state) {
   switch (this->pin_) {
     case OutputPin::OUTPUT_LDO2:
-      this->get_parent()->configure_ldo2(state != 0.0f);
-      if (state != 1.0f) {
-        this->get_parent()->configure_ldo2_voltage(state);
-      }
+      //this->get_parent()->configure_ldo2(state != 0.0f);
+      //if (state != 1.0f) {
+//        this->get_parent()->configure_ldo2_voltage(state);
+      //}
       break;
     case OutputPin::OUTPUT_LDO3:
       this->get_parent()->configure_ldo3(state != 0.0f);
