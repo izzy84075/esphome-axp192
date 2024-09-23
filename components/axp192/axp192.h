@@ -292,6 +292,12 @@ enum class LDOio0Control : uint8_t {
 
 class AXP192Component : public PollingComponent, public i2c::I2CDevice {
 public:
+  void register_monitor(MonitorType type, Axp192BinarySensor *monitor);
+  void register_irq(IrqType type, Axp192BinarySensor *irq);
+  void register_sensor(SensorType type, Axp192Sensor *sensor);
+  void register_output(OutputPin pin, Axp192Output *output);
+  void register_switch(OutputPin pin, Axp192Switch *output);
+
   void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
   void set_charging_sensor(binary_sensor::BinarySensor *charging_sensor) { charging_sensor_ = charging_sensor; }
   void set_brightness(float brightness) { brightness_ = brightness; }
@@ -352,8 +358,23 @@ public:
   bool load_register(RegisterLocations reg);
   bool save_register(RegisterLocations reg);
 
+#ifdef USE_BINARY_SENSOR
+  void enable_irq(IrqType irq);
+#endif
+
+void update_powercontrol(OutputPin pin, bool value);
+
 private:
     static std::string GetStartupReason();
+    void publish_helper_(SensorType type, float state);
+  void debug_log_register_(RegisterLocations reg);
+
+  void publish_helper_(IrqType type, bool state);
+  void publish_helper_(MonitorType type, bool state);
+#ifdef USE_BINARY_SENSOR
+  void do_irqs_();
+  uint32_t last_irq_buffer_ = 0xFF;
+#endif
 
 protected:
     sensor::Sensor *batterylevel_sensor_;
