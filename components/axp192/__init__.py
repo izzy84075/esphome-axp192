@@ -17,11 +17,11 @@ MODELS = {
     "M5TOUGH": AXP192Model.AXP192_M5TOUGH,
 }
 
-AXP192_MODEL = cv.enum(MODELS, upper=True, space="_")
+AXP192_MODEL = axp192_ns.enum(MODELS, upper=True, space="_")
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AXP192Component),
-    cv.Required(CONF_MODEL): AXP192_MODEL,
+    cv.Required(CONF_MODEL): cv.enum(AXP192_MODEL),
     cv.Optional(CONF_BATTERY_LEVEL):
         sensor.sensor_schema(
             unit_of_measurement=UNIT_PERCENT,

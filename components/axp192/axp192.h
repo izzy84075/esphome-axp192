@@ -16,7 +16,7 @@ enum AXP192Model {
   AXP192_M5TOUGH,
 };
 
-/ 9.11.1
+// 9.11.1
 enum class RegisterLocations : uint8_t {
   POWER_SUPPLY_STATUS = 0x00,
   POWER_SUPPLY_CHARGE_STATUS = 0x01,
