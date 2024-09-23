@@ -1080,8 +1080,8 @@ void AXP192Component::SetSleep(void)
 void AXP192Component::DeepSleep(uint64_t time_in_us)
 {
     SetSleep();
-    esp_sleep_enable_ext0_wakeup((gpio_num_t)37, 0 /* LOW */);
-    if (time_in_us > 0)
+    //esp_sleep_enable_ext0_wakeup((gpio_num_t)37, 0 /* LOW */);
+    /*if (time_in_us > 0)
     {
         esp_sleep_enable_timer_wakeup(time_in_us);
     }
@@ -1089,12 +1089,12 @@ void AXP192Component::DeepSleep(uint64_t time_in_us)
     {
         esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
     }
-    (time_in_us == 0) ? esp_deep_sleep_start() : esp_deep_sleep(time_in_us);
+    (time_in_us == 0) ? esp_deep_sleep_start() : esp_deep_sleep(time_in_us);*/
 }
 
 void AXP192Component::LightSleep(uint64_t time_in_us)
 {
-    if (time_in_us > 0)
+    /*if (time_in_us > 0)
     {
         esp_sleep_enable_timer_wakeup(time_in_us);
     }
@@ -1102,7 +1102,7 @@ void AXP192Component::LightSleep(uint64_t time_in_us)
     {
         esp_sleep_disable_wakeup_source(ESP_SLEEP_WAKEUP_TIMER);
     }
-    esp_light_sleep_start();
+    esp_light_sleep_start();*/
 }
 
 // 0 not press, 0x01 long press, 0x02 press
@@ -1257,7 +1257,7 @@ void AXP192Component::SetAdcState(bool state)
 }
 
 std::string AXP192Component::GetStartupReason() {
-  esp_reset_reason_t reset_reason = ::esp_reset_reason();
+  /*esp_reset_reason_t reset_reason = ::esp_reset_reason();
   if (reset_reason == ESP_RST_DEEPSLEEP) {
     esp_sleep_source_t wake_reason = esp_sleep_get_wakeup_cause();
     if (wake_reason == ESP_SLEEP_WAKEUP_EXT0)
@@ -1296,7 +1296,7 @@ std::string AXP192Component::GetStartupReason() {
   if (reset_reason == ESP_RST_BROWNOUT)
     return "ESP_RST_BROWNOUT";
   if (reset_reason == ESP_RST_SDIO)
-    return "ESP_RST_SDIO";
+    return "ESP_RST_SDIO";*/
   return std::string{"RESET_UNKNOWN_REASON"};
 }
 
