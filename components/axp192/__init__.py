@@ -9,15 +9,14 @@ CONF_CHARGING = "charging"
 DEPENDENCIES = ['i2c']
 axp192_ns = cg.esphome_ns.namespace('axp192')
 AXP192Component = axp192_ns.class_('AXP192Component', cg.PollingComponent, i2c.I2CDevice)
-AXP192Model = axp192_ns.enum("AXP192Model")
-
-MODELS = {
-    "M5CORE2": AXP192Model.M5CORE2,
-    "M5STICKC": AXP192Model.M5STICKC,
-    "M5TOUGH": AXP192Model.M5TOUGH,
-}
+#AXP192Model = axp192_ns.enum("AXP192Model")
 
 AXP192_MODEL = axp192_ns.enum('MODELS', is_class=True)
+MODELS = {
+    'M5CORE2': AXP192Model.M5CORE2,
+    'M5STICKC': AXP192Model.M5STICKC,
+    'M5TOUGH': AXP192Model.M5TOUGH,
+}
 
 CONF_OUTPUT_LDO2 = 'ldo2'
 CONF_OUTPUT_LDO3 = 'ldo3'
