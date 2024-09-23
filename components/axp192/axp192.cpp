@@ -101,7 +101,7 @@ void AXP192Component::update() {
     this->update_powercontrol(OutputPin::OUTPUT_DCDC3, this->get_dcdc3_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_LDOIO0, this->get_ldoio0_enabled());
 
-    #ifdef USE_BINARY_SENSOR
+#ifdef USE_BINARY_SENSOR
   if (!this->monitors_.empty()) {
     {
       auto buffer = this->read_bytes<4>(0x0);
