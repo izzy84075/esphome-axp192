@@ -73,13 +73,13 @@ void AXP192Component::setup()
         begin(false, false, false, false, false);
 
         // If we're waking from a cold boot
-        if (GetStartupReason() == "ESP_RST_POWERON")
+        /*if (GetStartupReason() == "ESP_RST_POWERON")
         {
             ESP_LOGD(TAG, "First power on, restarting ESP...");
 
             // Reboot the ESP with the axp initialised
             ESP.restart();
-        }
+        }*/
         break;
     }
   }
