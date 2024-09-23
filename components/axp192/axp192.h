@@ -8,6 +8,9 @@
 
 namespace esphome {
 namespace axp192 {
+  class AXP192BinarySensor;
+  class AXP192Sensor;
+  class AXP192Switch;
   class AXP192Output;
 
 enum class AXP192Model : uint8_t {
@@ -15,6 +18,26 @@ enum class AXP192Model : uint8_t {
   M5CORE2,
   M5TOUGH,
 };
+
+namespace detail {
+  template<typename T, T InMin, T InMax, uint8_t OutMin, uint8_t OutMax> uint8_t constrained_remap(T value) {
+    return uint8_t(remap<T, T>(clamp<T>(value, InMin, InMax), InMin, InMax, OutMin, OutMax));
+  }
+
+  static constexpr size_t find_register_bit(size_t size, size_t index, size_t bit) {
+    return 1U << (bit + ((size - index - 1) * 8));
+  }
+
+  // NOLINTNEXTLINE(fuchsia-trailing-return)
+  template<typename E> static constexpr auto to_int(const E value) -> typename std::underlying_type<E>::type {
+    return static_cast<typename std::underlying_type<E>::type>(value);
+  }
+
+  template<typename E> static std::string to_hex(const E value) {
+    return format_hex_pretty(static_cast<typename std::underlying_type<E>::type>(value));
+  }
+
+}  // namespace detail
 
 // 9.11.1
 enum class RegisterLocations : uint8_t {
