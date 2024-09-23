@@ -329,7 +329,7 @@ void AXP192Component::dump_config() {
   }
 }
 
-void Axp192Component::debug_log_register_(RegisterLocations reg) {
+void AXP192Component::debug_log_register_(RegisterLocations reg) {
   auto val = this->read_byte(detail::to_int(reg));
   if (val.has_value()) {
     ESP_LOGD(this->get_component_source(), "Read %s from 0x%X", detail::format_bits(val.value()).c_str(),
