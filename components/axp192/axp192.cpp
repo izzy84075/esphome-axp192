@@ -38,6 +38,236 @@ void AXP192Component::setup()
   }
 }
 
+bool AXP192Component::configure_ldoio0(bool enable) {
+#ifdef USE_SWITCH
+  auto location = this->power_control_.find(OutputPin::OUTPUT_LDOIO0);
+  this->load_register(RegisterLocations::GPIO_CONTROL);
+  this->set_ldoio0_mode(enable ? LDOio0Control::LOWNOISE_LDO : LDOio0Control::FLOATING);
+  if (this->save_register(RegisterLocations::GPIO_CONTROL)) {
+    this->update_powercontrol(OutputPin::OUTPUT_LDOIO0, this->get_ldoio0_enabled());
+    return true;
+  }
+#endif
+  return false;
+}
+
+void AXP192Component::set_voff(VoffVoltage voff) {
+  this->update_register(RegisterLocations::VOFF_VOLTAGE, detail::to_int(voff), 0b11111000);
+}
+
+void AXP192Component::set_charge_voltage(ChargeVoltage voltage) {
+  this->update_register(RegisterLocations::CHARGE_CONTROL_REG1, detail::to_int(voltage), 0b10011111);
+}
+
+void AXP192Component::set_charge_current(ChargeCurrent current) {
+  this->update_register(RegisterLocations::CHARGE_CONTROL_REG1, detail::to_int(current), 0b11110000);
+}
+
+void AXP192Component::set_vbus_ipsout(VBusIpsout val) {
+  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b01111111);
+}
+
+void AXP192Component::set_vbus_hold_current_limited(VBusHoldCurrentLimited val) {
+  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11111101);
+}
+
+void AXP192Component::set_vbus_hold_current_limit(VBusHoldCurrentLimit val) {
+  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11111110);
+}
+
+void AXP192Component::set_vbus_hold_voltage_limited(VBusHoldVoltageLimited val) {
+  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b10111111);
+}
+
+void AXP192Component::set_vbus_hold_voltage_limit(VBusHoldVoltageLimit val) {
+  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11000111);
+}
+
+void AXP192Component::set_disable_rtc(bool disable_rtc) {
+  this->update_register(RegisterLocations::BATTERY_BACKUP_CONTROL, disable_rtc ? 0x0 : 0b10000000, 0b11000111);
+}
+
+void AXP192Component::set_disable_ldo2(bool disable_ldo2) {
+  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_ldo2 ? 0x0 : 0b00000100, 0b11111011);
+}
+
+void AXP192Component::set_disable_ldo3(bool disable_ldo3) {
+  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_ldo3 ? 0x0 : 0b11110111, 0b00001000);
+}
+
+void AXP192Component::set_disable_dcdc1(bool disable_dcdc1) {
+  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_dcdc1 ? 0x0 : 0b00000010, 0b11111101);
+}
+
+void AXP192Component::set_disable_dcdc3(bool disable_dcdc3) {
+  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_dcdc3 ? 0x0 : 0b00000001, 0b11111110);
+}
+
+void AXP192Component::set_dcdc1_voltage(uint32_t dcdc1_voltage) {
+  this->update_register(RegisterLocations::DCDC1_VOLTAGE,
+                        detail::constrained_remap<uint32_t, 700, 3500, 0x0, 0x7F>(dcdc1_voltage), 0b10000000);
+}
+
+void AXP192Component::set_dcdc3_voltage(uint32_t dcdc3_voltage) {
+  this->update_register(RegisterLocations::DCDC3_VOLTAGE,
+                        detail::constrained_remap<uint32_t, 700, 3500, 0x0, 0x7F>(dcdc3_voltage), 0b10000000);
+}
+
+void AXP192Component::set_ldo2_voltage(uint32_t ldo2_voltage) {
+  this->update_register(RegisterLocations::LDO23_VOLTAGE,
+                        (detail::constrained_remap<int, 1800, 3300, 0x0, 0x0F>(ldo2_voltage) << 4), 0b00001111);
+}
+
+void AXP192Component::set_ldo3_voltage(uint32_t ldo3_voltage) {
+  this->update_register(RegisterLocations::LDO23_VOLTAGE,
+                        detail::constrained_remap<uint32_t, 1800, 3300, 0x0, 0x0F>(ldo3_voltage), 0b11110000);
+}
+
+void AXP192Component::set_ldoio0_voltage(uint32_t ldoio0_voltage) {
+  this->update_register(RegisterLocations::GPIO_LDO_VOLTAGE,
+                        (detail::constrained_remap<uint32_t, 1800, 3300, 0x0, 0x0F>(ldoio0_voltage) << 4), 0b00001111);
+}
+
+void AXP192Component::set_ldoio0_mode(LDOio0Control mode) {
+  this->update_register(RegisterLocations::GPIO_CONTROL, detail::to_int(mode), 0b11111000);
+}
+
+bool AXP192Component::configure_ldo2(bool enable) {
+  this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->set_disable_ldo2(!enable);
+  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+    this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
+    return true;
+  }
+  return false;
+}
+
+bool AXP192Component::configure_ldo3(bool enable) {
+  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->set_disable_ldo3(!enable);
+  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+    this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
+    return true;
+  }
+  return false;
+}
+
+bool AXP192Component::configure_dcdc1(bool enable) {
+  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->set_disable_dcdc1(!enable);
+  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+    this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
+    return true;
+  }
+  return false;
+}
+
+bool AXP192Component::configure_dcdc3(bool enable) {
+  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->set_disable_dcdc3(!enable);
+  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+    this->update_powercontrol(OutputPin::OUTPUT_DCDC3, this->get_dcdc3_enabled());
+    return true;
+  }
+  return false;
+}
+
+bool AXP192Component::configure_ldo2_voltage(float level) {
+  auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 1800, 3300);
+  this->load_register(RegisterLocations::LDO23_VOLTAGE);
+  this->set_ldo2_voltage(scaled);
+  return this->save_register(RegisterLocations::LDO23_VOLTAGE);
+}
+
+bool AXP192Component::configure_ldo3_voltage(float level) {
+  auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 1800, 3300);
+  this->load_register(RegisterLocations::LDO23_VOLTAGE);
+  this->set_ldo3_voltage(scaled);
+  return this->save_register(RegisterLocations::LDO23_VOLTAGE);
+}
+
+bool AXP192Component::configure_dcdc1_voltage(float level) {
+  auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 700, 3500);
+  this->load_register(RegisterLocations::DCDC1_VOLTAGE);
+  this->set_dcdc1_voltage(scaled);
+  return this->save_register(RegisterLocations::DCDC1_VOLTAGE);
+}
+
+bool AXP192Component::configure_dcdc3_voltage(float level) {
+  auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 700, 3500);
+  this->load_register(RegisterLocations::DCDC3_VOLTAGE);
+  this->set_dcdc3_voltage(scaled);
+  return this->save_register(RegisterLocations::DCDC3_VOLTAGE);
+}
+
+bool AXP192Component::configure_ldoio0_voltage(float level) {
+  auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 1800, 3300);
+  this->load_register(RegisterLocations::GPIO_LDO_VOLTAGE);
+  this->set_ldoio0_voltage(scaled);
+  return this->save_register(RegisterLocations::GPIO_LDO_VOLTAGE);
+}
+
+bool AXP192Component::get_ldo2_enabled() {
+  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00000100) != 0;
+}
+
+bool AXP192Component::get_ldo3_enabled() {
+  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00001000) != 0;
+}
+
+bool AXP192Component::get_dcdc1_enabled() {
+  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00000001) != 0;
+}
+
+bool AXP192Component::get_dcdc3_enabled() {
+  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00000010) != 0;
+}
+
+bool AXP192Component::get_ldoio0_enabled() {
+  return (this->registers_.at(RegisterLocations::GPIO_CONTROL) & 0b00000111) == 0b00000010;
+}
+
+float AXP192Component::get_ldo2_voltage() {
+  auto raw = (this->registers_.at(RegisterLocations::LDO23_VOLTAGE) & 0b11110000) >> 4;
+  return remap<float, uint8_t>(raw, 0, 0x0F, 0, 100);
+}
+
+float AXP192Component::get_ldo3_voltage() {
+  auto raw = (this->registers_.at(RegisterLocations::LDO23_VOLTAGE) & 0b00001111);
+  return remap<float, uint8_t>(raw, 0, 0x0F, 0, 100);
+}
+
+float AXP192Component::get_dcdc1_voltage() {
+  auto raw = (this->registers_.at(RegisterLocations::DCDC1_VOLTAGE) & 0b01111111);
+  return remap<float, uint8_t>(raw, 0, 0x7F, 0, 100);
+}
+
+float AXP192Component::get_dcdc3_voltage() {
+  auto raw = (this->registers_.at(RegisterLocations::DCDC3_VOLTAGE) & 0b01111111);
+  return remap<float, uint8_t>(raw, 0, 0x7F, 0, 100);
+}
+
+float AXP192Component::get_ldoio0_voltage() {
+  auto raw = (this->registers_.at(RegisterLocations::GPIO_LDO_VOLTAGE) & 0b11110000) >> 4;
+  return remap<float, uint8_t>(raw, 0, 0x0F, 0, 100);
+}
+
+void AXP192Component::set_dcdc2_voltage(uint32_t dcdc2_voltage) {
+  this->update_register(RegisterLocations::DCDC2_VOLTAGE,
+                        detail::constrained_remap<uint32_t, 700, 2275, 0x0, 0x3F>(dcdc2_voltage), 0b11000000);
+}
+
+void AXP192Component::set_disable_dcdc2(bool disable_dcdc2) {
+  this->update_register(RegisterLocations::EXTEN_DCDC2_CONTROL, disable_dcdc2 ? 0x0 : 0b00000101, 0b11111010);
+}
+
+bool AXP192Component::configure_dcdc2(bool enable) {
+  this->load_register(RegisterLocations::EXTEN_DCDC2_CONTROL);
+  this->set_disable_dcdc2(!enable);
+  return this->save_register(RegisterLocations::EXTEN_DCDC2_CONTROL);
+}
+
 void AXP192Component::dump_config() {
   ESP_LOGCONFIG(TAG, "AXP192:");
   LOG_I2C_DEVICE(this);
