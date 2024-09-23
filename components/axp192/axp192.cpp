@@ -871,12 +871,13 @@ void AXP192Component::UpdateBrightness()
         return;
     }
 
-    ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
-    curr_brightness_ = brightness_;
+    float tempBrightness = brightness_;
+    //ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
+    
 
     const uint8_t c_min = 7;
     const uint8_t c_max = 12;
-    auto ubri = c_min + static_cast<uint8_t>(brightness_ * (c_max - c_min));
+    auto ubri = c_min + static_cast<uint8_t>(tempBrightness * (c_max - c_min));
 
     if (ubri > c_max)
     {
@@ -902,11 +903,12 @@ void AXP192Component::UpdateBrightness()
         break;
       }
     }
-    if (brightness_ == 0) {
+    if (tempBrightness == 0) {
       SetLDO2(false);
-    } else {
+    } else if(curr_brightness_ == 0) {
       SetLDO2(true);
     }
+    curr_brightness_ = tempBrightness;
 }
 
 bool AXP192Component::GetBatState()
