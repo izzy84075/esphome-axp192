@@ -360,11 +360,11 @@ protected:
     AXP192Model model_;
 
     #ifdef USE_OUTPUT
-    std::map<OutputPin, Axp192Output *> output_control_{};
+    std::map<OutputPin, AXP192Output *> output_control_{};
   #endif
 
   #ifdef USE_SWITCH
-    std::map<OutputPin, Axp192Switch *> power_control_{};
+    std::map<OutputPin, AXP192Switch *> power_control_{};
   #endif
 
     std::map<RegisterLocations, uint8_t> registers_{
