@@ -367,11 +367,11 @@ public:
   void enable_irq(IrqType irq);
 #endif
 
-void update_powercontrol(OutputPin pin, bool value);
+  void update_powercontrol(OutputPin pin, bool value);
 
 private:
-    static std::string GetStartupReason();
-    void publish_helper_(SensorType type, float state);
+  static std::string GetStartupReason();
+  void publish_helper_(SensorType type, float state);
   void debug_log_register_(RegisterLocations reg);
 
   void publish_helper_(IrqType type, bool state);
