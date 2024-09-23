@@ -352,6 +352,7 @@ public:
   void dump_config() override;
   float get_setup_priority() const override;
   void update() override;
+  void loop() override;
 
   void power_off();
   void prepare_sleep();
