@@ -95,7 +95,7 @@ void AXP192Component::update() {
     this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
     this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
     this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
-    //this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
+    this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_DCDC3, this->get_dcdc3_enabled());
