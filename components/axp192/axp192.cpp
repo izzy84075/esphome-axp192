@@ -249,8 +249,6 @@ void AXP192Component::update() {
       ESP_LOGD(TAG, "Got Charging=%d state=%d", charging, battery_state);
       this->charging_sensor_->publish_state(charging);
     }*/
-  
-    UpdateBrightness();
 }
 
 void AXP192Component::loop() {
@@ -258,6 +256,7 @@ void AXP192Component::loop() {
 #ifdef USE_BINARY_SENSORS
   this->do_irqs_();
 #endif
+  UpdateBrightness();
 }
 
 void AXP192Component::power_off() {}
