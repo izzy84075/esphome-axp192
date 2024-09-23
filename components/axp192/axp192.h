@@ -17,8 +17,8 @@ class AXP192Output;
 
 enum class AXP192Model : uint8_t {
   M5STICKC = 0,
-  M5CORE2,
-  M5TOUGH,
+  M5CORE2 = 1,
+  M5TOUGH = 2,
 };
 
 namespace detail {
