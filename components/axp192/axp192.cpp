@@ -1,4 +1,21 @@
 #include "axp192.h"
+
+#ifdef USE_BINARY_SENSOR
+#include "binary_sensor/axp192_binary_sensor.h"
+#endif
+
+#ifdef USE_OUTPUT
+#include "output/axp192_output.h"
+#endif
+
+#ifdef USE_SENSOR
+#include "sensor/axp192_sensor.h"
+#endif
+
+#ifdef USE_SWITCH
+#include "switch/axp192_switch.h"
+#endif
+
 #include "esphome/core/log.h"
 #include "esp_sleep.h"
 #include <Esp.h>
@@ -35,6 +52,9 @@ void AXP192Component::setup()
         }
         break;
     }
+  }
+  if (!this->configure_axp()) {
+    this->mark_failed();
   }
 }
 
@@ -316,12 +336,159 @@ bool AXP192Component::configure_dcdc2(bool enable) {
 void AXP192Component::dump_config() {
   ESP_LOGCONFIG(TAG, "AXP192:");
   LOG_I2C_DEVICE(this);
+  LOG_UPDATE_INTERVAL(this);
   LOG_SENSOR("  ", "Battery Level", this->batterylevel_sensor_);
+  ESP_LOGCONFIG(this->get_component_source(), "Registers:");
+  for(auto reg : this->registers_) {
+    ESP_LOGCONFIG(this->get_component_source(), "  %s %s", detail::to_hex(reg.first).c_str(),
+                  detail::format_bits(reg.second).c_str());
+  }
+  
 }
 
 float AXP192Component::get_setup_priority() const { return setup_priority::DATA; }
 
 void AXP192Component::update() {
+    this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
+    this->debug_log_register_(RegisterLocations::DCDC2_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::DCDC1_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
+    this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
+    this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
+    this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
+    this->update_powercontrol(OutputPin::OUTPUT_DCDC3, this->get_dcdc3_enabled());
+    this->update_powercontrol(OutputPin::OUTPUT_LDOIO0, this->get_ldoio0_enabled());
+
+    #ifdef USE_BINARY_SENSOR
+  if (!this->monitors_.empty()) {
+    {
+      auto buffer = this->read_bytes<4>(0x0);
+      if (buffer.has_value()) {
+        ESP_LOGV(this->get_component_source(), "Binary sensors");
+        detail::log_register_bits(this->get_component_source(), RegisterLocations::POWER_SUPPLY_STATUS, buffer.value());
+
+        // power supply
+        bool acin_present = (buffer.value().at(0) & 0b10000000) != 0;
+
+        this->publish_helper_(MonitorType::ACIN_PRESENT, acin_present);
+
+        bool acin_valid = (buffer.value().at(0) & 0b01000000) != 0;
+        this->publish_helper_(MonitorType::ACIN_VALID, !acin_valid);
+
+        bool vbus_present = (buffer.value().at(0) & 0b00100000) != 0;
+        this->publish_helper_(MonitorType::VBUS_PRESENT, vbus_present);
+
+        bool vbus_valid = (buffer.value().at(0) & 0b00010000) != 0;
+        this->publish_helper_(MonitorType::VBUS_VALID, !vbus_valid);
+
+        bool vhold_over = (buffer.value().at(0) & 0b00001000) != 0;
+        this->publish_helper_(MonitorType::VBUS_ABOVE, vhold_over);
+
+        bool charge_state = (buffer.value().at(0) & 0b00000100) != 0;
+        this->publish_helper_(MonitorType::BATTERY_CURRENT_DIRECTION, !charge_state);
+
+        bool acin_vbus_short = (buffer.value().at(0) & 0b00000010) != 0;
+        this->publish_helper_(MonitorType::ACIN_VBUS_SHORT, acin_vbus_short);
+
+        bool acin_vbus_trigger = (buffer.value().at(0) & 0b00000001) != 0;
+        this->publish_helper_(MonitorType::ACIN_VBUS_TRIGGER_BOOT, acin_vbus_trigger);
+
+        // battery
+        bool axp_overtemp = (buffer.value().at(1) & 0b10000000) != 0;
+        this->publish_helper_(MonitorType::AXP_OVER_TEMP, axp_overtemp);
+
+        bool charging = (buffer.value().at(1) & 0b01000000) != 0;
+        this->publish_helper_(MonitorType::CHARGE_INDICATE, charging);
+
+        bool battery_present = (buffer.value().at(1) & 0b00100000) != 0;
+        this->publish_helper_(MonitorType::BATTERY_PRESENT, battery_present);
+
+        bool battery_active = (buffer.value().at(1) & 0b00001000) != 0;
+        this->publish_helper_(MonitorType::BATTERY_ACTIVE, battery_active);
+
+        bool current_under = (buffer.value().at(1) & 0b00000100) != 0;
+        this->publish_helper_(MonitorType::CHARGE_CURRENT_LOW, current_under);
+      }
+    }
+  }
+#endif
+#ifdef USE_SENSOR
+  if (!this->sensors_.empty()) {
+    ESP_LOGV(this->get_component_source(), "Value sensors:");
+    // Scale values from section 9.7
+    {
+      auto buffer = this->read_bytes<10>(detail::to_int(RegisterLocations::ACIN_VOLTAGE_HIGH8));
+      if (buffer.has_value()) {
+        detail::log_register_bits(this->get_component_source(), RegisterLocations::ACIN_VOLTAGE_HIGH8, buffer.value());
+
+        auto acin_voltage = detail::encode_12bit(buffer.value().at(0), buffer.value().at(1));
+        this->publish_helper_(SensorType::ACIN_VOLTAGE, remap<float, uint16_t>(acin_voltage, 0x0, 0xFFF, 0, 6.9615));
+
+        auto acin_current = detail::encode_12bit(buffer.value().at(2), buffer.value().at(3));
+        this->publish_helper_(SensorType::ACIN_CURRENT, remap<float, uint16_t>(acin_current, 0x0, 0xFFF, 0, 2.5594));
+
+        auto vbus_voltage = detail::encode_12bit(buffer.value().at(4), buffer.value().at(5));
+        this->publish_helper_(SensorType::VBUS_VOLTAGE, remap<float, uint16_t>(vbus_voltage, 0x0, 0xFFF, 0, 6.9615));
+
+        auto vbus_current = detail::encode_12bit(buffer.value().at(6), buffer.value().at(7));
+        this->publish_helper_(SensorType::VBUS_CURRENT, remap<float, uint16_t>(vbus_current, 0x0, 0xFFF, 0, 1.5356));
+
+        auto axp_internal_temp = detail::encode_12bit(buffer.value().at(8), buffer.value().at(9));
+        this->publish_helper_(SensorType::AXP_TEMP,
+                              remap<float, uint16_t>(axp_internal_temp, 0x0, 0xFFF, -144.7, 264.8));
+      }
+    }
+
+    {
+      auto buffer = this->read_bytes<10>(detail::to_int(RegisterLocations::BATTERY_TEMP_HIGH8));
+      if (buffer.has_value()) {
+        detail::log_register_bits(this->get_component_source(), RegisterLocations::BATTERY_TEMP_HIGH8, buffer.value());
+        auto battery_temp = detail::encode_12bit(buffer.value().at(0), buffer.value().at(1));
+        this->publish_helper_(SensorType::BATTERY_TEMP,
+                              remap<float, uint16_t>(battery_temp, 0x0, 0xFFF, -144.7, 264.8));
+
+        auto gpio0_voltage = detail::encode_12bit(buffer.value().at(2), buffer.value().at(3));
+        this->publish_helper_(SensorType::GPIO0_VOLTAGE, remap<float, uint16_t>(gpio0_voltage, 0x0, 0xFFF, 0, 2.0475));
+
+        auto gpio1_voltage = detail::encode_12bit(buffer.value().at(4), buffer.value().at(5));
+        this->publish_helper_(SensorType::GPIO1_VOLTAGE, remap<float, uint16_t>(gpio1_voltage, 0x0, 0xFFF, 0, 2.0475));
+
+        auto gpio2_voltage = detail::encode_12bit(buffer.value().at(6), buffer.value().at(7));
+        this->publish_helper_(SensorType::GPIO2_VOLTAGE, remap<float, uint16_t>(gpio2_voltage, 0x0, 0xFFF, 0, 2.0475));
+
+        auto gpio3_voltage = detail::encode_12bit(buffer.value().at(8), buffer.value().at(9));
+        this->publish_helper_(SensorType::GPIO3_VOLTAGE, remap<float, uint16_t>(gpio3_voltage, 0x0, 0xFFF, 0, 2.0475));
+      }
+    }
+
+    {
+      auto buffer = this->read_bytes<16>(detail::to_int(RegisterLocations::BATTERY_POWER_HIGH8));
+      if (buffer.has_value()) {
+        detail::log_register_bits(this->get_component_source(), RegisterLocations::BATTERY_POWER_HIGH8, buffer.value());
+
+        auto battery_power = encode_uint24(buffer.value().at(0), buffer.value().at(1), buffer.value().at(2));
+        this->publish_helper_(SensorType::BATTERY_POWER, battery_power);
+
+        auto battery_voltage = detail::encode_12bit(buffer.value().at(8), buffer.value().at(9));
+        this->publish_helper_(SensorType::BATTERY_VOLTAGE,
+                              remap<float, uint16_t>(battery_voltage, 0x0, 0xFFF, 0, 4.5045));
+
+        auto battery_charge_current = detail::encode_13bit(buffer.value().at(10), buffer.value().at(11));
+        this->publish_helper_(SensorType::BATTERY_CHARGE_CURRENT,
+                              remap<float, uint16_t>(battery_charge_current, 0x0, 0xFFF, 0, 4.095));
+
+        auto battery_discharge_current = detail::encode_13bit(buffer.value().at(12), buffer.value().at(13));
+        this->publish_helper_(SensorType::BATTERY_DISCHARGE_CURRENT,
+                              remap<float, uint16_t>(battery_discharge_current, 0x0, 0xFFF, 0, 4.095));
+
+        auto aps_voltage = detail::encode_12bit(buffer.value().at(14), buffer.value().at(15));
+        this->publish_helper_(SensorType::APS_VOLTAGE, remap<float, uint16_t>(aps_voltage, 0x0, 0xFFF, 0, 5.733));
+      }
+    }
+  }
+#endif
 
     if (this->batterylevel_sensor_ != nullptr) {
       // To be fixed
@@ -344,6 +511,13 @@ void AXP192Component::update() {
     }
   
     UpdateBrightness();
+}
+
+void AXP192Component::loop() {
+  // IRQ triggers
+#ifdef USE_BINARY_SENSORS
+  this->do_irqs_();
+#endif
 }
 
 
