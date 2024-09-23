@@ -10,10 +10,10 @@ namespace esphome {
 namespace axp192 {
   class AXP192Output;
 
-enum AXP192Model {
-  AXP192_M5STICKC = 0,
-  AXP192_M5CORE2,
-  AXP192_M5TOUGH,
+enum class AXP192Model : uint8_t {
+  M5STICKC = 0,
+  M5CORE2,
+  M5TOUGH,
 };
 
 // 9.11.1
