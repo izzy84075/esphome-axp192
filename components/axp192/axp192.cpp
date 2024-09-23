@@ -520,6 +520,155 @@ void AXP192Component::loop() {
 #endif
 }
 
+#ifdef USE_BINARY_SENSOR
+void AXP192Component::do_irqs_() {
+  // Read all IRQ registers at once
+  auto buffer = this->read_bytes<4>(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER1));
+  if (buffer.has_value()) {
+    auto bits = encode_uint32(buffer.value()[0], buffer.value()[1], buffer.value()[2], buffer.value()[3]);
+    if (bits != this->last_irq_buffer_) {
+      ESP_LOGV(this->get_component_source(),
+               "IRQ Register Load: IRQ_STATUS_REGISTER1: 0x%08X, raw: 0x%02X, 0x%02X, 0x%02X, 0x%02X", bits,
+               buffer.value()[0], buffer.value()[1], buffer.value()[2], buffer.value()[3]);
+      this->last_irq_buffer_ = bits;
+      uint32_t clear_bits = 0x00;
+      for (auto irq : this->irqs_) {
+        auto val = (detail::to_int(irq.first) & bits) != 0;
+        this->publish_helper_(irq.first, val);
+        if (val) {
+          ESP_LOGV(this->get_component_source(), "Accept: %s: 0x%08X, clear bits: 0x%08X",
+                   detail::to_hex(irq.first).c_str(), detail::to_int(irq.first), clear_bits);
+          clear_bits |= detail::to_int(irq.first);
+        }
+      }
+      auto output = decode_value(clear_bits);
+      if (output[0] > 0) {
+        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER1), output[0]);
+      }
+      if (output[1] > 0) {
+        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER2), output[1]);
+      }
+      if (output[2] > 0) {
+        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER3), output[2]);
+      }
+      if (output[3] > 0) {
+        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER4), output[3]);
+      }
+      ESP_LOGV(this->get_component_source(),
+               "IRQ Register Save: IRQ_STATUS_REGISTER1: 0x%08X, raw: 0x%02X, 0x%02X, 0x%02X, 0x%02X", clear_bits,
+               output[0], output[1], output[2], output[3]);
+    }
+  }
+}
+
+void AXP192Component::enable_irq(IrqType irq) {
+
+  ESP_LOGV(this->get_component_source(), "Enable IRQ %s bits: 0x%80X", detail::to_hex(irq).c_str(),
+           detail::to_int(irq));
+  if (detail::to_int(irq) > 0x800000) {
+    ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER1 value: 0x%02X, mask: 0x%02X",
+             (detail::to_int(irq) >> 24) & 0xFF, ~(detail::to_int(irq) >> 24) & 0xFF);
+    load_register(RegisterLocations::IRQ_ENABLE_REGISTER1);
+    update_register(RegisterLocations::IRQ_ENABLE_REGISTER1, (detail::to_int(irq) >> 24) & 0xFF,
+                    ~(detail::to_int(irq) >> 24) & 0xFF);
+    save_register(RegisterLocations::IRQ_ENABLE_REGISTER1);
+    return;
+  }
+  if (detail::to_int(irq) > 0x8000) {
+    ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER2 value: 0%02X, mask: 0%02X",
+             (detail::to_int(irq) >> 16) & 0xFF, ~(detail::to_int(irq) >> 16) & 0xFF);
+    load_register(RegisterLocations::IRQ_ENABLE_REGISTER2);
+    update_register(RegisterLocations::IRQ_ENABLE_REGISTER2, (detail::to_int(irq) >> 16) & 0xFF,
+                    ~(detail::to_int(irq) >> 16) & 0xFF);
+    save_register(RegisterLocations::IRQ_ENABLE_REGISTER2);
+    return;
+  }
+  if (detail::to_int(irq) > 0x80) {
+    ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER3 value: 0%02X, mask: 0%02X",
+             (detail::to_int(irq) >> 8) & 0xFF, ~(detail::to_int(irq) >> 8) & 0xFF);
+    load_register(RegisterLocations::IRQ_ENABLE_REGISTER3);
+    update_register(RegisterLocations::IRQ_ENABLE_REGISTER3, (detail::to_int(irq) >> 8) & 0xFF,
+                    ~(detail::to_int(irq) >> 8) & 0xFF);
+    save_register(RegisterLocations::IRQ_ENABLE_REGISTER3);
+    return;
+  }
+  ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER4 value: 0%02X, mask: 0%02X",
+           detail::to_int(irq) & 0xFF, ~(detail::to_int(irq) & 0xFF));
+  load_register(RegisterLocations::IRQ_ENABLE_REGISTER4);
+  update_register(RegisterLocations::IRQ_ENABLE_REGISTER4, detail::to_int(irq) & 0xFF, ~(detail::to_int(irq)) & 0xFF);
+  save_register(RegisterLocations::IRQ_ENABLE_REGISTER4);
+}
+#endif
+
+void AXP192Component::update_powercontrol(OutputPin pin, bool value) {
+#ifdef USE_SWITCH
+  if (this->power_control_.empty())
+    return;
+
+  auto location = this->power_control_.find(pin);
+  if (location != this->power_control_.end()) {
+    location->second->publish_state(value);
+  }
+#endif
+}
+
+void AXP192Component::publish_helper_(SensorType type, float state) {
+#ifdef USE_SENSOR
+  auto sensor = this->sensors_.find(type);
+  if (sensor != this->sensors_.end()) {
+    sensor->second->publish_state(state);
+  }
+#endif
+}
+
+void AXP192Component::publish_helper_(IrqType type, bool state) {
+#ifdef USE_BINARY_SENSOR
+  auto sensor = this->irqs_.find(type);
+  if (sensor != this->irqs_.end()) {
+    sensor->second->publish_state(state);
+  }
+#endif
+}
+
+void AXP192Component::publish_helper_(MonitorType type, bool state) {
+#ifdef USE_BINARY_SENSOR
+  auto sensor = this->monitors_.find(type);
+  if (sensor != this->monitors_.end()) {
+    sensor->second->publish_state(state);
+  }
+#endif
+}
+
+void AXP192Component::register_irq(IrqType type, AXP192BinarySensor *irq) {
+#ifdef USE_BINARY_SENSOR
+  irqs_.insert(std::make_pair(type, irq));
+#endif
+}
+
+void AXP192Component::register_sensor(SensorType type, AXP192Sensor *sensor) {
+#ifdef USE_SENSOR
+  sensors_.insert(std::make_pair(type, sensor));
+#endif
+}
+
+void AXP192Component::register_output(OutputPin pin, AXP192Output *output) {
+#ifdef USE_OUTPUT
+  output_control_.insert(std::make_pair(pin, output));
+#endif
+}
+
+void AXP192Component::register_switch(OutputPin pin, AXP192Switch *output) {
+#ifdef USE_SWITCH
+  power_control_.insert(std::make_pair(pin, output));
+#endif
+}
+
+void AXP192Component::register_monitor(MonitorType type, AXP192BinarySensor *monitor) {
+#ifdef USE_BINARY_SENSOR
+  monitors_.insert(std::make_pair(type, monitor));
+#endif
+}
+
 
 void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC, bool disableDCDC1, bool disableDCDC3)
 {
