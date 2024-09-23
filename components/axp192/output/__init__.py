@@ -10,8 +10,8 @@ AXP192Output = axp192_ns.class_("AXP192Output", output.FloatOutput)
 
 CONFIG_SCHEMA = output.FLOAT_OUTPUT_SCHEMA.extend(
     {
-        cv.Required(CONF_ID): cv.declare_id(Axp192Output),
-        cv.GenerateID(CONF_AXP192_ID): cv.use_id(Axp192Component),
+        cv.Required(CONF_ID): cv.declare_id(AXP192Output),
+        cv.GenerateID(CONF_AXP192_ID): cv.use_id(AXP192Component),
         cv.Required(CONF_OUTPUT): cv.enum(OUTPUT_PIN),
         cv.Optional(CONF_VOLTAGE): cv.voltage
     }
