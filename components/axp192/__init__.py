@@ -123,7 +123,7 @@ CONF_LDOIO0_MODE = 'ldoio0_mode'
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(AXP192Component),
-    cv.Required(CONF_MODEL): cv.enum(AXP192_MODEL),
+    cv.Required(CONF_MODEL): cv.enum(MODELS),
     cv.Optional(CONF_BATTERY_LEVEL):
         sensor.sensor_schema(
             unit_of_measurement=UNIT_PERCENT,
