@@ -1,7 +1,7 @@
 #include "axp192.h"
 
 #ifdef USE_BINARY_SENSOR
-//#include "binary_sensor/axp192_binary_sensor.h"
+#include "binary_sensor/axp192_binary_sensor.h"
 #endif
 
 #ifdef USE_OUTPUT
