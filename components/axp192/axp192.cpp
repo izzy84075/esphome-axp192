@@ -57,18 +57,18 @@ namespace axp192 {
 void AXP192Component::setup()
 {
   switch (this->model_) {
-    case M5STICKC:
+    case AXP192Model::M5STICKC:
     {
         begin(false, false, false, false, false);
         break;
     }
-    case M5CORE2:
+    case AXP192Model::M5CORE2:
     {
         // disable LDO3 Vibration
         begin(false, true, false, false, false);
         break;
     }
-    case M5TOUGH:
+    case AXP192Model::M5TOUGH:
     {
         begin(false, false, false, false, false);
 
