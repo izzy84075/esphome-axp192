@@ -1,5 +1,4 @@
-#ifndef __AXP192_H__
-#define __AXP192_H__
+#pragma once
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
@@ -524,5 +523,3 @@ protected:
 
 }
 }
-
-#endif
