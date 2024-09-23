@@ -875,19 +875,19 @@ void AXP192Component::UpdateBrightness()
         ubri = c_max;
     }
     switch (this->model_) {
-      case M5STICKC:
+      case AXP192Model::M5STICKC:
       {
         uint8_t buf = Read8bit( 0x28 );
         Write1Byte( 0x28 , ((buf & 0x0f) | (ubri << 4)) );
         break;
       }
-      case M5CORE2:
+      case AXP192Model::M5CORE2:
       {
         uint8_t buf = Read8bit( 0x27 );
         Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
         break;
       }
-      case M5TOUGH:
+      case AXP192Model::M5TOUGH:
       {
         uint8_t buf = Read8bit( 0x27 );
         Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
