@@ -1,20 +1,20 @@
 #include "axp192.h"
 
-//#ifdef USE_BINARY_SENSOR
+#ifdef USE_BINARY_SENSOR
 #include "binary_sensor/axp192_binary_sensor.h"
-//#endif
+#endif
 
-//#ifdef USE_OUTPUT
+#ifdef USE_OUTPUT
 #include "output/axp192_output.h"
-//#endif
+#endif
 
-//#ifdef USE_SENSOR
+#ifdef USE_SENSOR
 #include "sensor/axp192_sensor.h"
-//#endif
+#endif
 
-//#ifdef USE_SWITCH
+#ifdef USE_SWITCH
 #include "switch/axp192_switch.h"
-//#endif
+#endif
 
 #include "esphome/core/log.h"
 //#include "esp_sleep.h"
