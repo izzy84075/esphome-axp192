@@ -18,7 +18,7 @@
 
 #include "esphome/core/log.h"
 //#include "esp_sleep.h"
-//#include <Esp.h>
+#include <Esp.h>
 #define TAG this->get_component_source()
 
 namespace esphome {
@@ -89,12 +89,12 @@ void AXP192Component::setup()
 }
 
 void AXP192Component::update() {
-    this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
-    this->debug_log_register_(RegisterLocations::DCDC2_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::DCDC1_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
+    //this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
+    //this->debug_log_register_(RegisterLocations::DCDC2_VOLTAGE);
+    //this->debug_log_register_(RegisterLocations::DCDC1_VOLTAGE);
+    //this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
+    //this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
+    //this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
     this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
@@ -316,6 +316,18 @@ bool AXP192Component::save_register(RegisterLocations reg) {
     return true;
   }
   return false;
+}
+
+void AXP192Component::dump_config() {
+  ESP_LOGCONFIG(TAG, "AXP192:");
+  LOG_I2C_DEVICE(this);
+  LOG_UPDATE_INTERVAL(this);
+  ESP_LOGCONFIG(this->get_component_source(), "Registers:");
+  for(auto reg : this->registers_) {
+    ESP_LOGCONFIG(this->get_component_source(), "  %s %s", detail::to_hex(reg.first).c_str(),
+                  detail::format_bits(reg.second).c_str());
+  }
+  
 }
 
 bool AXP192Component::configure_ldoio0(bool enable) {
@@ -546,18 +558,6 @@ bool AXP192Component::configure_dcdc2(bool enable) {
   this->load_register(RegisterLocations::EXTEN_DCDC2_CONTROL);
   this->set_disable_dcdc2(!enable);
   return this->save_register(RegisterLocations::EXTEN_DCDC2_CONTROL);
-}
-
-void AXP192Component::dump_config() {
-  ESP_LOGCONFIG(TAG, "AXP192:");
-  LOG_I2C_DEVICE(this);
-  LOG_UPDATE_INTERVAL(this);
-  ESP_LOGCONFIG(this->get_component_source(), "Registers:");
-  for(auto reg : this->registers_) {
-    ESP_LOGCONFIG(this->get_component_source(), "  %s %s", detail::to_hex(reg.first).c_str(),
-                  detail::format_bits(reg.second).c_str());
-  }
-  
 }
 
 float AXP192Component::get_setup_priority() const { return setup_priority::DATA; }
