@@ -1,18 +1,19 @@
 #pragma once
 
-#include "esphome/core/component.h"
-#include "esphome/core/automation.h"
 #include "esphome/components/i2c/i2c.h"
+#include "esphome/core/automation.h"
+#include "esphome/core/component.h"
 
 #include <map>
 #include <unordered_map>
 
 namespace esphome {
 namespace axp192 {
-  class AXP192BinarySensor;
-  class AXP192Sensor;
-  class AXP192Switch;
-  class AXP192Output;
+
+class AXP192BinarySensor;
+class AXP192Sensor;
+class AXP192Switch;
+class AXP192Output;
 
 enum class AXP192Model : uint8_t {
   M5STICKC = 0,
@@ -296,8 +297,8 @@ public:
   void register_output(OutputPin pin, AXP192Output *output);
   void register_switch(OutputPin pin, AXP192Switch *output);
 
-  void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
-  void set_charging_sensor(binary_sensor::BinarySensor *charging_sensor) { charging_sensor_ = charging_sensor; }
+  //void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
+  //void set_charging_sensor(binary_sensor::BinarySensor *charging_sensor) { charging_sensor_ = charging_sensor; }
   void set_brightness(float brightness) { brightness_ = brightness; }
   void set_model(AXP192Model model) { this->model_ = model; }
 
