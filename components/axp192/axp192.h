@@ -292,11 +292,11 @@ enum class LDOio0Control : uint8_t {
 
 class AXP192Component : public PollingComponent, public i2c::I2CDevice {
 public:
-  void register_monitor(MonitorType type, Axp192BinarySensor *monitor);
-  void register_irq(IrqType type, Axp192BinarySensor *irq);
-  void register_sensor(SensorType type, Axp192Sensor *sensor);
-  void register_output(OutputPin pin, Axp192Output *output);
-  void register_switch(OutputPin pin, Axp192Switch *output);
+  void register_monitor(MonitorType type, AXP192BinarySensor *monitor);
+  void register_irq(IrqType type, AXP192BinarySensor *irq);
+  void register_sensor(SensorType type, AXP192Sensor *sensor);
+  void register_output(OutputPin pin, AXP192Output *output);
+  void register_switch(OutputPin pin, AXP192Switch *output);
 
   void set_batterylevel_sensor(sensor::Sensor *batterylevel_sensor) { batterylevel_sensor_ = batterylevel_sensor; }
   void set_charging_sensor(binary_sensor::BinarySensor *charging_sensor) { charging_sensor_ = charging_sensor; }
