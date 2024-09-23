@@ -715,13 +715,13 @@ void AXP192Component::register_monitor(MonitorType type, AXP192BinarySensor *mon
 void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC, bool disableDCDC1, bool disableDCDC3)
 {
   switch (this->model_) {
-    case M5STICKC:
+    case AXP192Model::M5STICKC:
     {
         // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
         Write1Byte(0x28, 0xcc);
         break;
     }
-    case M5CORE2:
+    case AXP192Model::M5CORE2:
     {
         // Set DCDC3 (TFT_LED & TFT) 3.0V
         Write1Byte(0x27, 0xcc);
@@ -729,7 +729,7 @@ void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC,
         Write1Byte(0x28, 0xcc);
         break;
     }
-    case M5TOUGH:
+    case AXP192Model::M5TOUGH:
     {
         // Set DCDC3 (TFT_LED & TFT) 3.0V
         Write1Byte(0x27, 0xcc);
