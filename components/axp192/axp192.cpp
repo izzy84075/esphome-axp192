@@ -89,12 +89,12 @@ void AXP192Component::setup()
 }
 
 void AXP192Component::update() {
-    //this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
-    //this->debug_log_register_(RegisterLocations::DCDC2_VOLTAGE);
-    //this->debug_log_register_(RegisterLocations::DCDC1_VOLTAGE);
-    //this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
-    //this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
-    //this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
+    this->debug_log_register_(RegisterLocations::DCDC2_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::DCDC1_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
+    this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
     this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
@@ -327,7 +327,16 @@ void AXP192Component::dump_config() {
     ESP_LOGCONFIG(this->get_component_source(), "  %s %s", detail::to_hex(reg.first).c_str(),
                   detail::format_bits(reg.second).c_str());
   }
-  
+}
+
+void Axp192Component::debug_log_register_(RegisterLocations reg) {
+  auto val = this->read_byte(detail::to_int(reg));
+  if (val.has_value()) {
+    ESP_LOGD(this->get_component_source(), "Read %s from 0x%X", detail::format_bits(val.value()).c_str(),
+             detail::to_int(reg));
+  } else {
+    ESP_LOGD(this->get_component_source(), "Failed to read 0x%X", detail::to_int(reg));
+  }
 }
 
 bool AXP192Component::configure_ldoio0(bool enable) {
