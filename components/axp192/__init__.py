@@ -1,7 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome import
-from esphome.components import i2c, sensor
+from esphome import automation
 from esphome.components import i2c, sensor, binary_sensor
 from esphome.const import CONF_ID,\
     CONF_BATTERY_LEVEL, CONF_BRIGHTNESS, UNIT_PERCENT, ICON_BATTERY, CONF_MODEL
