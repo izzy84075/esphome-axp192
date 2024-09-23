@@ -118,6 +118,138 @@ enum class RegisterLocations : uint8_t {
 
 enum class OutputPin : uint8_t { OUTPUT_LDO2, OUTPUT_LDO3, OUTPUT_DCDC1, OUTPUT_DCDC3, OUTPUT_LDOIO0 };
 
+// 32bit int - <reg 00><reg 1> MSB -> LSB
+
+enum class MonitorType : uint32_t {
+  // reg 0x00 - 9.11.5
+  ACIN_PRESENT = detail::find_register_bit(2, 0, 7),
+  ACIN_VALID = detail::find_register_bit(2, 0, 6),
+  VBUS_PRESENT = detail::find_register_bit(2, 0, 5),
+  VBUS_VALID = detail::find_register_bit(2, 0, 4),
+  VBUS_ABOVE = detail::find_register_bit(2, 0, 3),
+  BATTERY_CURRENT_DIRECTION = detail::find_register_bit(2, 0, 2),
+  ACIN_VBUS_SHORT = detail::find_register_bit(2, 0, 1),
+  ACIN_VBUS_TRIGGER_BOOT = detail::find_register_bit(2, 0, 0),
+  // reg 0x01 - 9.11.6
+  AXP_OVER_TEMP = detail::find_register_bit(2, 1, 7),
+  CHARGE_INDICATE = detail::find_register_bit(2, 1, 6),
+  BATTERY_PRESENT = detail::find_register_bit(2, 1, 5),
+  BATTERY_ACTIVE = detail::find_register_bit(2, 1, 3),
+  CHARGE_CURRENT_LOW = detail::find_register_bit(2, 1, 2)
+};
+// 42 - 6)
+//  32bit int - <reg 40><reg 41><reg 43><reg 43> MSB -> LSB
+enum class IrqType : uint32_t {
+  // reg RegisterLocations::IRQ_STATUS_REGISTER1 - 9.11.53
+  ACIN_OVER_VOLTAGE = detail::find_register_bit(4, 0, 7),
+  ACIN_INSERTED = detail::find_register_bit(4, 0, 6),
+  ACIN_REMOVED = detail::find_register_bit(4, 0, 5),
+  VBUS_OVER_VOLTAGE = detail::find_register_bit(4, 0, 4),
+  VBUS_INSERTED = detail::find_register_bit(4, 0, 3),
+  VBUS_REMOVED = detail::find_register_bit(4, 0, 2),
+  VBUS_LOW = detail::find_register_bit(4, 0, 1),
+  // reg RegisterLocations::IRQ_ENABLE_REGISTER2 - 9.11.54
+  BATTERY_INSERTED = detail::find_register_bit(4, 1, 7),
+  BATTERY_REMOVED = detail::find_register_bit(4, 1, 6),
+  BATTERY_ACTIVATED = detail::find_register_bit(4, 1, 5),
+  BATTERY_DEACTIVATED = detail::find_register_bit(4, 1, 4),
+  CHARGING_STARTED = detail::find_register_bit(4, 1, 3),
+  CHARGING_FINISHED = detail::find_register_bit(4, 1, 2),
+  BATTERY_OVER_TEMP = detail::find_register_bit(4, 1, 1),
+  BATTERY_UNDER_TEMP = detail::find_register_bit(4, 1, 0),
+  // reg 42 - 9.11.55
+  AXP_OVER_TEMP = detail::find_register_bit(4, 2, 7),
+  LOW_CHARGE_CURRENT = detail::find_register_bit(4, 2, 6),
+  DCDC1_UNDER_VOLTAGE = detail::find_register_bit(4, 2, 5),
+  DCDC2_UNDER_VOLTAGE = detail::find_register_bit(4, 2, 4),
+  DCDC3_UNDER_VOLTAGE = detail::find_register_bit(4, 2, 3),
+  SHORT_KEY_PRESS = detail::find_register_bit(4, 2, 1),
+  LONG_KEY_PRESS = detail::find_register_bit(4, 2, 0),
+  // reg 43 - 9.11.56
+  POWERON_NOE = detail::find_register_bit(4, 3, 7),
+  POWEROFF_NOE = detail::find_register_bit(4, 3, 6),
+  VBUS_VALID = detail::find_register_bit(4, 3, 5),
+  VBUS_INVALID = detail::find_register_bit(4, 3, 4),
+  VBUS_SESSION_AB = detail::find_register_bit(4, 3, 3),
+  VBUS_SESSION_END = detail::find_register_bit(4, 3, 1),
+  APS_UNDER_VOLTAGE = detail::find_register_bit(4, 3, 0)
+};
+
+enum class SensorType : uint8_t {
+  ACIN_VOLTAGE,
+  ACIN_CURRENT,
+  VBUS_VOLTAGE,
+  VBUS_CURRENT,
+  AXP_TEMP,
+  BATTERY_TEMP,
+  BATTERY_POWER,
+  BATTERY_VOLTAGE,
+  BATTERY_CHARGE_CURRENT,
+  BATTERY_DISCHARGE_CURRENT,
+  APS_VOLTAGE,
+  GPIO0_VOLTAGE,
+  GPIO1_VOLTAGE,
+  GPIO2_VOLTAGE,
+  GPIO3_VOLTAGE
+};
+
+enum class VoffVoltage : uint8_t {
+  VOFF_2600MV = 0b0000,
+  VOFF_2700MV = 0b0001,
+  VOFF_2800MV = 0b0010,
+  VOFF_2900MV = 0b0011,
+  VOFF_3000MV = 0b0100,
+  VOFF_3100MV = 0b0101,
+  VOFF_3200MV = 0b0110,
+  VOFF_3300MV = 0b0111
+};
+
+enum class ChargeCurrent : uint8_t {
+  CHARGE_100MA = 0b0000,
+  CHARGE_190MA = 0b0001,
+  CHARGE_280MA = 0b0010,
+  CHARGE_360MA = 0b0011,
+  CHARGE_450MA = 0b0100,
+  CHARGE_550MA = 0b0101,
+  CHARGE_630MA = 0b0110,
+  CHARGE_700MA = 0b0111
+};
+
+enum class ChargeVoltage : uint8_t {
+  CHARGE_4100MV = 0b00000000,
+  CHARGE_4150MV = 0b00100000,
+  CHARGE_4200MV = 0b01000000,
+  CHARGE_4360MV = 0b01100000
+};
+
+enum class VBusHoldVoltageLimit : uint8_t {
+  HOLD_4000MV = 0b00000000,
+  HOLD_4100MV = 0b00001000,
+  HOLD_4200MV = 0b00010000,
+  HOLD_4300MV = 0b00011000,
+  HOLD_4400MV = 0b00100000,
+  HOLD_4500MV = 0b00101000,
+  HOLD_4600MV = 0b00110000,
+  HOLD_4700MV = 0b00111000
+};
+
+enum class VBusHoldVoltageLimited : uint8_t { VOLTAGE_NOT_LIMITED = 0b00000000, VOLTAGE_LIMITED = 0b01000000 };
+
+enum class VBusIpsout : uint8_t { IPSOUT_NOT_MANAGED = 0b00000000, IPSOUT_MANAGED = 0b10000000 };
+
+enum class VBusHoldCurrentLimited : uint8_t { CURRENT_NOT_LIMITED = 0b00000000, CURRENT_LIMITED = 0b00000010 };
+
+enum class VBusHoldCurrentLimit : uint8_t { CURRENT_LIMIT_500MA = 0b0000, CURRENT_LIMIT_100MA = 0b0001 };
+
+enum class LDOio0Control : uint8_t {
+  NMOS_OPENDRAIN = 0b000,
+  GENERAL_INPUT = 0b001,
+  LOWNOISE_LDO = 0b010,
+  ADC_IN = 0b100,
+  LOW_OUTPUT = 0b101,
+  FLOATING = 0b111
+};
+
 #define SLEEP_MSEC(us) (((uint64_t)us) * 1000L)
 #define SLEEP_SEC(us)  (((uint64_t)us) * 1000000L)
 #define SLEEP_MIN(us)  (((uint64_t)us) * 60L * 1000000L)
@@ -199,6 +331,60 @@ protected:
     float brightness_{1.0f};
     float curr_brightness_{-1.0f};
     AXP192Model model_;
+
+    #ifdef USE_OUTPUT
+    std::map<OutputPin, Axp192Output *> output_control_{};
+  #endif
+
+  #ifdef USE_SWITCH
+    std::map<OutputPin, Axp192Switch *> power_control_{};
+  #endif
+
+    std::map<RegisterLocations, uint8_t> registers_{
+      {RegisterLocations::EXTEN_DCDC2_CONTROL, 0x00},              // 9.11.9 (DC-DC2 and external)
+      {RegisterLocations::DCDC13_LDO23_CONTROL, 0xFF},             // 9.11.10 (DC-DC1/3 and LDO2/3 control)
+      {RegisterLocations::DCDC2_VOLTAGE, 0x16},                    // 9.11.11 (DC-DC2 voltage)
+      {RegisterLocations::DCDC1_VOLTAGE, 0x68},                    // 9.11.13 (DC-DC1) voltage
+      {RegisterLocations::DCDC3_VOLTAGE, 0x48},                    // 9.11.14 (DC-DC3) voltage
+      {RegisterLocations::LDO23_VOLTAGE, 0xCF},                    // 9.11.15 (LDO2 LDO3) voltage
+      {RegisterLocations::VBUS_IPSOUT_ACCESS, 0x6F},               // 9.11.16 (vbus hold) voltage
+      {RegisterLocations::VOFF_VOLTAGE, 0xF3},                     // 9.11.17 (power off) voltage
+      {RegisterLocations::POWEROFF_BATTERY_CHLED_CONTROL, 0x46},   // 9.11.18 (battery control)
+      {RegisterLocations::CHARGE_CONTROL_REG1, 0xC8},              // 9.11.19 (charge control)
+      {RegisterLocations::BATTERY_BACKUP_CONTROL, 0x22},           // 9.11.21 (RTC)
+      {RegisterLocations::PEK_PARAMETERS, 0x5D},                   // 9.11.22 (powerkey)
+      {RegisterLocations::BATTERY_CHARGE_OVERTEMP_VALUE, 0x1F},    // 9.11.25 (temperature protection)
+      {RegisterLocations::IRQ_ENABLE_REGISTER1, 0xD8},             // 9.11.53 (IRQ1 enable)
+      {RegisterLocations::IRQ_ENABLE_REGISTER2, 0xFF},             // 9.11.53 (IRQ1 enable)
+      {RegisterLocations::IRQ_ENABLE_REGISTER3, 0x3B},             // 9.11.53 (IRQ1 enable)
+      {RegisterLocations::IRQ_ENABLE_REGISTER4, 0xC1},             // 9.11.53 (IRQ1 enable)
+      {RegisterLocations::ADC_ENABLE_REGISTER1, 0xFF},             // 9.11.31 (ADC1 control)
+      {RegisterLocations::ADC_ENABLE_REGISTER2, 0xFF},             // 9.11.32 (ADC2 control)
+      {RegisterLocations::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0x33},  // 9.11.33 (ADC1 params)
+      {RegisterLocations::GPIO_30_INPUT_RANGE, 0x00},              // 9.11.34 (ADC2 params)
+      {RegisterLocations::GPIO_CONTROL, 0x07},                     // 9.11.30 (GPIO0 function) LDio0 enable
+      {RegisterLocations::GPIO_LDO_VOLTAGE, 0xA0},                 // 9.11.39 (LDio0) voltage
+  };
+
+  std::unordered_map<RegisterLocations, uint8_t> register_masks_{
+      {RegisterLocations::DCDC13_LDO23_CONTROL, 0b11110000},
+      {RegisterLocations::EXTEN_DCDC2_CONTROL, 0b11111010},
+      {RegisterLocations::DCDC2_VOLTAGE, 0b11000000},
+      {RegisterLocations::DCDC1_VOLTAGE, 0b10000000},
+      {RegisterLocations::DCDC3_VOLTAGE, 0b10000000},
+      {RegisterLocations::VOFF_VOLTAGE, 0b11111000},
+      {RegisterLocations::POWEROFF_BATTERY_CHLED_CONTROL, 0b00000100},
+      {RegisterLocations::BATTERY_BACKUP_CONTROL, 0b00011100},
+      {RegisterLocations::IRQ_ENABLE_REGISTER1, 0b00000001},
+      {RegisterLocations::IRQ_ENABLE_REGISTER3, 0b00000100},
+      {RegisterLocations::IRQ_ENABLE_REGISTER4, 0b00000010},
+      {RegisterLocations::ADC_ENABLE_REGISTER2, 0b01111000},
+      {RegisterLocations::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0b00001000},
+      {RegisterLocations::GPIO_30_INPUT_RANGE, 0b11110000},
+      {RegisterLocations::GPIO_CONTROL, 0b11110000},
+      {RegisterLocations::GPIO_LDO_VOLTAGE, 0b00001111},
+  };
+
 
     /** M5 Stick Values
      * LDO2: Display backlight
