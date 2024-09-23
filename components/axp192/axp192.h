@@ -322,6 +322,10 @@ public:
   float get_setup_priority() const override;
   void update() override;
 
+  bool update_register(RegisterLocations reg, uint8_t value, uint8_t clear_mask);
+  bool load_register(RegisterLocations reg);
+  bool save_register(RegisterLocations reg);
+
 private:
     static std::string GetStartupReason();
 

@@ -38,6 +38,51 @@ void AXP192Component::setup()
   }
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+bool AXP192Component::update_register(RegisterLocations reg, uint8_t value, uint8_t clear_mask) {
+  auto location = this->registers_.find(reg);
+  if (location != this->registers_.end()) {
+    location->second &= clear_mask;
+    location->second |= value;
+  }
+  return location != this->registers_.end();
+}
+
+bool AXP192Component::load_register(RegisterLocations reg) {
+  auto location = this->registers_.find(reg);
+  if (location == this->registers_.end()) {
+    return false;
+  }
+  auto contents = this->read_byte(detail::to_int(reg));
+  if (contents.has_value()) {
+    location->second = contents.value();
+    ESP_LOGVV(this->get_component_source(), "Read %s from 0x%02X", detail::format_bits(location->second).c_str(),
+              detail::to_int(reg));
+  }
+  return contents.has_value();
+}
+
+bool AXP192Component::save_register(RegisterLocations reg) {
+  auto location = this->registers_.find(reg);
+  if (location == this->registers_.end()) {
+    return false;
+  }
+
+  auto base = 0xFF;
+  auto mask = this->register_masks_.find(reg);
+  if (mask != this->register_masks_.end()) {
+    base = this->read_byte(detail::to_int(reg)).value_or(0x00) & mask->second;
+  }
+
+  base |= location->second;
+  if (this->write_byte(detail::to_int(reg), base)) {
+    ESP_LOGVV(this->get_component_source(), "Wrote %s to 0x%02X", detail::format_bits(base).c_str(),
+              detail::to_int(reg));
+    return true;
+  }
+  return false;
+}
+
 bool AXP192Component::configure_ldoio0(bool enable) {
 #ifdef USE_SWITCH
   auto location = this->power_control_.find(OutputPin::OUTPUT_LDOIO0);
