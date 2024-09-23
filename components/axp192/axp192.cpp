@@ -19,6 +19,7 @@
 #include "esphome/core/log.h"
 //#include "esp_sleep.h"
 //#include <Esp.h>
+#define TAG this->get_component_source()
 
 namespace esphome {
 namespace axp192 {
@@ -53,7 +54,6 @@ namespace axp192 {
 
   }
 
-static const char *TAG = "axp192.sensor";
 void AXP192Component::setup()
 {
   switch (this->model_) {
@@ -520,7 +520,7 @@ void AXP192Component::update() {
   }
 #endif
 
-    if (this->batterylevel_sensor_ != nullptr) {
+    /*if (this->batterylevel_sensor_ != nullptr) {
       // To be fixed
       // This is not giving the right value - mostly there to have some sample sensor...
       float vbat = GetBatVoltage();
@@ -538,7 +538,7 @@ void AXP192Component::update() {
       bool charging = GetChargingState();
       ESP_LOGD(TAG, "Got Charging=%d state=%d", charging, battery_state);
       this->charging_sensor_->publish_state(charging);
-    }
+    }*/
   
     UpdateBrightness();
 }
