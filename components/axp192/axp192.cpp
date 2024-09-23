@@ -260,11 +260,11 @@ void AXP192Component::loop() {
 #endif
 }
 
-void Axp192Component::power_off() {}
+void AXP192Component::power_off() {}
 
-void Axp192Component::prepare_sleep() {}
+void AXP192Component::prepare_sleep() {}
 
-bool Axp192Component::configure_axp() {
+bool AXP192Component::configure_axp() {
   for (auto &reg : this->registers_) {
     if (!save_register(reg.first)) {
       return false;

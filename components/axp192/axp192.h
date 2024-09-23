@@ -353,6 +353,11 @@ public:
   float get_setup_priority() const override;
   void update() override;
 
+  void power_off();
+  void prepare_sleep();
+  void configure_battery();
+  bool configure_axp();
+
   bool update_register(RegisterLocations reg, uint8_t value, uint8_t clear_mask);
   bool load_register(RegisterLocations reg);
   bool save_register(RegisterLocations reg);
