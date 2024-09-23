@@ -23,6 +23,36 @@
 namespace esphome {
 namespace axp192 {
 
+  namespace detail {
+
+    // NOLINTNEXTLINE(readability-identifier-naming)
+    const char *const bit_rep[16] = {
+        [0] = "0000",  [1] = "0001",  [2] = "0010",  [3] = "0011",  [4] = "0100",  [5] = "0101",
+        [6] = "0110",  [7] = "0111",  [8] = "1000",  [9] = "1001",  [10] = "1010", [11] = "1011",
+        [12] = "1100", [13] = "1101", [14] = "1110", [15] = "1111",
+    };
+
+    std::string format_bits(uint8_t byte) { return std::string{"0b"} + bit_rep[byte >> 4] + bit_rep[byte & 0x0F]; }
+
+    template<size_t N>
+    void log_register_bits(const char *const tag, RegisterLocations reg, const std::array<uint8_t, N> &bytes) {
+      auto regnum = detail::to_int(reg);
+      ESP_LOGV(tag, "Register bytes starting at 0x%02X", regnum);
+      for (int idx = 0; idx < N; idx++) {
+        ESP_LOGV(tag, "  Register 0x%02X is %s", idx + regnum, detail::format_bits(bytes[idx]).c_str());
+      }
+    }
+
+    constexpr uint16_t encode_12bit(uint8_t msb, uint8_t lsb) {
+      return (static_cast<uint16_t>(msb) << 4) | (static_cast<uint16_t>(lsb));
+    }
+
+    constexpr uint16_t encode_13bit(uint8_t msb, uint8_t lsb) {
+      return (static_cast<uint16_t>(msb) << 4) | (static_cast<uint16_t>(lsb));
+    }
+
+  }
+
 static const char *TAG = "axp192.sensor";
 void AXP192Component::setup()
 {
