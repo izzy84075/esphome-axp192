@@ -41,6 +41,7 @@ CONF_OUTPUT_DCDC1 = 'dcdc1'
 CONF_OUTPUT_DCDC3 = 'dcdc3'
 CONF_OUTPUT_LDOIO0 = 'ldoio0'
 CONF_OUTPUT_BACKLIGHT = 'backlight'
+CONF_OUTPUT_CHARGE_CURRENT = 'charge_current'
 
 output_pin = axp192_ns.enum('OutputPin', is_class=True)
 OUTPUT_PIN = {
@@ -50,6 +51,7 @@ OUTPUT_PIN = {
     CONF_OUTPUT_DCDC3: output_pin.OUTPUT_DCDC3,
     CONF_OUTPUT_LDOIO0: output_pin.OUTPUT_LDOIO0,
     CONF_OUTPUT_BACKLIGHT: output_pin.OUTPUT_BACKLIGHT,
+    CONF_OUTPUT_CHARGE_CURRENT: output_pin.OUTPUT_CHARGE_CURRENT,
 }
 
 VoffVoltage = axp192_ns.enum('VoffVoltage', is_class=True)

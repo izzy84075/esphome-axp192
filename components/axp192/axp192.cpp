@@ -1178,9 +1178,10 @@ void AXP192Component::SetLDO3(bool State)
 
 void AXP192Component::SetChargeCurrent(uint8_t current)
 {
-    uint8_t buf = Read8bit(Registers::CHARGE_CONTROL_REG1);
+  update_register(Registers::CHARGE_CONTROL_REG1, (current & 0x07), 0xf0);
+    /*uint8_t buf = Read8bit(Registers::CHARGE_CONTROL_REG1);
     buf = (buf & 0xf0) | (current & 0x07);
-    WriteByte(Registers::CHARGE_CONTROL_REG1, buf);
+    WriteByte(Registers::CHARGE_CONTROL_REG1, buf);*/
 }
 
 void AXP192Component::PowerOff()

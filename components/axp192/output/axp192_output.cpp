@@ -53,6 +53,9 @@ void AXP192Output::write_state(float state) {
     case OutputPin::OUTPUT_BACKLIGHT:
       this->get_parent()->set_brightness(state);
       break;
+    case OutputPin::OUTPUT_CHARGE_CURRENT:
+      this->get_parent()->set_charge_current(remap(state, 0.0f, 1.0f, 0, 255));
+      break;
     default:
       break;
   }
