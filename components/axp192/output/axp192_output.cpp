@@ -54,7 +54,7 @@ void AXP192Output::write_state(float state) {
       this->get_parent()->set_brightness(state);
       break;
     case OutputPin::OUTPUT_CHARGE_CURRENT:
-      this->get_parent()->set_charge_current(remap<float, ChargeCurrent>(state, 0.0f, 1.0f, ChargeCurrent::CHARGE_100MA, ChargeCurrent::CHARGE_700MA));
+      this->get_parent()->set_charge_current(remap<ChargeCurrent, float>(state, 0.0f, 1.0f, ChargeCurrent::CHARGE_100MA, ChargeCurrent::CHARGE_700MA));
       break;
     default:
       break;
