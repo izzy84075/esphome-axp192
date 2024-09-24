@@ -274,6 +274,12 @@ bool AXP192Component::configure_axp() {
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 bool AXP192Component::update_register(Registers reg, uint8_t value, uint8_t clear_mask) {
+  //Do the actual register write
+  uint8_t regvalue = Read8bit(reg);
+  regvalue &= clear_mask;
+  regvalue |= value;
+
+  //And save it into the temp register, too, if applicable
   auto location = this->registers_.find(reg);
   if (location != this->registers_.end()) {
     location->second &= clear_mask;
