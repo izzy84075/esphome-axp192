@@ -55,6 +55,7 @@ void AXP192Output::write_state(float state) {
       break;
     case OutputPin::OUTPUT_CHARGE_CURRENT:
       this->get_parent()->SetChargeCurrent(remap(state, 0.0f, 1.0f, 0, 7));
+      ESP_LOGD(this->get_component_source(), "charge current float: %f", state);
       break;
     default:
       break;
