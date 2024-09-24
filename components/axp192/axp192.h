@@ -524,16 +524,6 @@ protected:
     uint32_t Read24bit( RegisterLocations reg );
     uint32_t Read32bit( RegisterLocations reg );
     void ReadBuf( RegisterLocations reg , uint8_t length, uint8_t *output );
-
-
-    void Write1Byte( uint8_t Addr ,  uint8_t Data );
-    uint8_t Read8bit( uint8_t Addr );
-    uint16_t Read12Bit( uint8_t Addr);
-    uint16_t Read13Bit( uint8_t Addr);
-    uint16_t Read16bit( uint8_t Addr );
-    uint32_t Read24bit( uint8_t Addr );
-    uint32_t Read32bit( uint8_t Addr );
-    void ReadBuff( uint8_t Addr , uint8_t Size , uint8_t *Buff );
 };
 
 }
