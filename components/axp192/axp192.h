@@ -516,6 +516,15 @@ protected:
 
     void PowerOff();
 
+    void WriteByte( RegisterLocations reg , uint8_t data);
+    uint8_t Read8bit( RegisterLocations reg );
+    uint16_t Read12bit( RegisterLocations reg );
+    uint16_t Read13bit( RegisterLocations reg );
+    uint16_t Read16bit( RegisterLocations reg );
+    uint32_t Read24bit( RegisterLocations reg );
+    uint32_t Read32bit( RegisterLocations reg );
+    void ReadBuf( RegisterLocations reg , uint8_t length, uint8_t *output );
+
 
     void Write1Byte( uint8_t Addr ,  uint8_t Data );
     uint8_t Read8bit( uint8_t Addr );

@@ -790,6 +790,60 @@ void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC,
 
 }
 
+void AXP192Component::WriteByte( RegisterLocations reg , uint8_t data) {
+  this->write_byte(static_cast<uint8_t>(reg), data);
+}
+
+uint8_t AXP192Component::Read8bit( RegisterLocations reg ) {
+  uint8_t data;
+  this->read_byte(static_cast<uint8_t>(reg), &data);
+  return data;
+}
+
+void AXP192Component::ReadBuf( RegisterLocations reg , uint8_t length, uint8_t *output) {
+  this->read_bytes(static_cast<uint8_t>(reg), output, length);
+}
+
+uint16_t AXP192Component::Read12bit( RegisterLocations reg ) {
+  uint16_t data = 0;
+  uint8_t buf[2];
+  ReadBuf(reg, 2, buf);
+  data = ((buf[0] << 4) + buf[1]);
+  return data;
+}
+
+uint16_t AXP192Component::Read13bit( RegisterLocations reg ) {
+  uint16_t data = 0;
+  uint8_t buf[2];
+  ReadBuf(reg, 2, buf);
+  data = ((buf[0] << 5) + buf[1]);
+  return data;
+}
+
+uint16_t AXP192Component::Read16bit( RegisterLocations reg ) {
+  uint16_t data = 0;
+  uint8_t buf[2];
+  ReadBuf(reg, 2, buf);
+  data = ((buf[0] << 8) + buf[1]);
+  return data;
+}
+
+uint32_t AXP192Component::Read24bit( RegisterLocations reg ) {
+  uint32_t data = 0;
+  uint8_t buf[3];
+  ReadBuf(reg, 3, buf);
+  data = ((buf[0] << 16) + (buf[1] << 8) + buf[2]);
+  return data;
+}
+
+uint32_t AXP192Component::Read32bit( RegisterLocations reg ) {
+  uint32_t data = 0;
+  uint8_t buf[4];
+  ReadBuf(reg, 4, buf);
+  data = ((buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3]);
+  return data;
+}
+
 void AXP192Component::Write1Byte( uint8_t Addr ,  uint8_t Data )
 {
     this->write_byte(Addr, Data);
@@ -889,14 +943,14 @@ void AXP192Component::UpdateBrightness()
         tempByte = this->Read8bit(RegisterLocations::LDO23_VOLTAGE);
         tempByte &= 0x0f;
         tempByte |= (ubri << 4);
-        this->Write1Byte(RegisterLocations::LDO23_VOLTAGE, tempByte);
+        this->WriteByte(RegisterLocations::LDO23_VOLTAGE, tempByte);
         break;
       case AXP192Model::M5CORE2:
       case AXP192Model::M5TOUGH:
         tempByte = this->Read8bit(RegisterLocations::DCDC3_VOLTAGE);
         tempByte &= 0x80;
         tempByte |= (ubri << 3);
-        this->Write1Byte(RegisterLocations::DCDC3_VOLTAGE, tempByte);
+        this->WriteByte(RegisterLocations::DCDC3_VOLTAGE, tempByte);
         break;
     }
     if (tempBrightness == 0) {
