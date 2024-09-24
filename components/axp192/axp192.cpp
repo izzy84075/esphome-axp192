@@ -885,23 +885,14 @@ void AXP192Component::UpdateBrightness()
     }
     switch (this->model_) {
       case AXP192Model::M5STICKC:
-      {
-        uint8_t buf = Read8bit( 0x28 );
-        Write1Byte( 0x28 , ((buf & 0x0f) | (ubri << 4)) );
+        update_register(RegisterLocations::LDO23_VOLTAGE, (ubri << 4), 0xf);
+        save_register(RegisterLocations::LDO23_VOLTAGE);
         break;
-      }
       case AXP192Model::M5CORE2:
-      {
-        uint8_t buf = Read8bit( 0x27 );
-        Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
-        break;
-      }
       case AXP192Model::M5TOUGH:
-      {
-        uint8_t buf = Read8bit( 0x27 );
-        Write1Byte( 0x27 , ((buf & 0x80) | (ubri << 3)) );
+        update_register(RegisterLocations::DCDC3_VOLTAGE, (ubri << 3), 0x80);
+        save_register(RegisterLocations::DCDC3_VOLTAGE);
         break;
-      }
     }
     if (tempBrightness == 0) {
       SetLDO2(false);
