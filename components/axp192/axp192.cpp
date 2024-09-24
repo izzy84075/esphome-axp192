@@ -896,7 +896,7 @@ bool AXP192Component::GetChargingState()
 uint8_t AXP192Component::GetBatData()
 {
     //return Read8bit(0x75);
-    error("Something's wrong here");
+    //error("Something's wrong here");
     return 0;
 }
 //---------coulombcounter_from_here---------
@@ -925,12 +925,12 @@ void  AXP192Component::ClearCoulombcounter(void) {
 }
 
 uint32_t AXP192Component::GetCoulombchargeData(void) {
-  return Read32bit(Registers::BATTERY_CHARGE_COULUMB_COUNTER3);
+  return Read32bit(Registers::BATTERY_CHARGE_COULUMB_COUNTER_32BIT_BASE);
 }
 
 uint32_t AXP192Component::GetCoulombdischargeData(void)
 {
-    return Read32bit(Registers::BATTERY_DISCHARGE_COULUMB_COUNTER3);
+    return Read32bit(Registers::BATTERY_DISCHARGE_COULUMB_COUNTER_32BIT_BASE);
 }
 
 float AXP192Component::GetCoulombData(void)
@@ -1174,7 +1174,7 @@ void AXP192Component::SetChargeCurrent(uint8_t current)
 {
     uint8_t buf = Read8bit(Registers::CHARGE_CONTROL_REG1);
     buf = (buf & 0xf0) | (current & 0x07);
-    Write1Byte(Registers::CHARGE_CONTROL_REG1, buf);
+    WriteByte(Registers::CHARGE_CONTROL_REG1, buf);
 }
 
 void AXP192Component::PowerOff()
