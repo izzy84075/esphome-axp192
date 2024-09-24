@@ -159,9 +159,9 @@ void AXP192Component::update() {
     ESP_LOGV(this->get_component_source(), "Value sensors:");
     // Scale values from section 9.7
     {
-      auto buffer = this->read_bytes<10>(detail::to_int(Registers::ACIN_VOLTAGE_HIGH8));
+      auto buffer = this->read_bytes<10>(detail::to_int(Registers::ACIN_VOLTAGE_12BIT_BASE));
       if (buffer.has_value()) {
-        detail::log_register_bits(this->get_component_source(), Registers::ACIN_VOLTAGE_HIGH8, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::ACIN_VOLTAGE_12BIT_BASE, buffer.value());
 
         auto acin_voltage = detail::encode_12bit(buffer.value().at(0), buffer.value().at(1));
         this->publish_helper_(SensorType::ACIN_VOLTAGE, remap<float, uint16_t>(acin_voltage, 0x0, 0xFFF, 0, 6.9615));
@@ -182,9 +182,9 @@ void AXP192Component::update() {
     }
 
     {
-      auto buffer = this->read_bytes<10>(detail::to_int(Registers::BATTERY_TEMP_HIGH8));
+      auto buffer = this->read_bytes<10>(detail::to_int(Registers::BATTERY_TEMP_12BIT_BASE));
       if (buffer.has_value()) {
-        detail::log_register_bits(this->get_component_source(), Registers::BATTERY_TEMP_HIGH8, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::BATTERY_TEMP_12BIT_BASE, buffer.value());
         auto battery_temp = detail::encode_12bit(buffer.value().at(0), buffer.value().at(1));
         this->publish_helper_(SensorType::BATTERY_TEMP,
                               remap<float, uint16_t>(battery_temp, 0x0, 0xFFF, -144.7, 264.8));
@@ -204,9 +204,9 @@ void AXP192Component::update() {
     }
 
     {
-      auto buffer = this->read_bytes<16>(detail::to_int(Registers::BATTERY_POWER_HIGH8));
+      auto buffer = this->read_bytes<16>(detail::to_int(Registers::BATTERY_POWER_24BIT_BASE));
       if (buffer.has_value()) {
-        detail::log_register_bits(this->get_component_source(), Registers::BATTERY_POWER_HIGH8, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::BATTERY_POWER_24BIT_BASE, buffer.value());
 
         auto battery_power = encode_uint24(buffer.value().at(0), buffer.value().at(1), buffer.value().at(2));
         this->publish_helper_(SensorType::BATTERY_POWER, battery_power);
