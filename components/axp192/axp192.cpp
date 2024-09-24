@@ -154,6 +154,7 @@ void AXP192Component::update() {
     }
   }
 #endif
+
 #ifdef USE_SENSOR
   if (!this->sensors_.empty()) {
     ESP_LOGV(this->get_component_source(), "Value sensors:");
@@ -278,6 +279,7 @@ bool AXP192Component::update_register(Registers reg, uint8_t value, uint8_t clea
   uint8_t regvalue = Read8bit(reg);
   regvalue &= clear_mask;
   regvalue |= value;
+  WriteByte(reg, regvalue);
 
   //And save it into the temp register, too, if applicable
   auto location = this->registers_.find(reg);
