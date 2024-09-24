@@ -321,6 +321,7 @@ public:
 
   void set_voff(VoffVoltage voff);  //
   void set_charge_voltage(ChargeVoltage voltage); //
+  void  SetChargeCurrent( uint8_t );
   void set_charge_current(ChargeCurrent current); //
   void set_vbus_ipsout(VBusIpsout val); //
   void set_vbus_hold_current_limited(VBusHoldCurrentLimited val); //
@@ -512,7 +513,7 @@ protected:
     void LightSleep(uint64_t time_in_us = 0);
 
     // void SetChargeVoltage( uint8_t );
-    void  SetChargeCurrent( uint8_t );
+    
     float GetBatVoltage();
     float GetBatCurrent();
     float GetVinVoltage();
