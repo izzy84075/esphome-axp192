@@ -107,7 +107,7 @@ void AXP192Component::update() {
       auto buffer = this->read_bytes<4>(0x0);
       if (buffer.has_value()) {
         ESP_LOGV(this->get_component_source(), "Binary sensors");
-        detail::log_register_bits(this->get_component_source(), RegisterLocations::POWER_SUPPLY_STATUS, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::POWER_SUPPLY_STATUS, buffer.value());
 
         // power supply
         bool acin_present = (buffer.value().at(0) & 0b10000000) != 0;
@@ -159,9 +159,9 @@ void AXP192Component::update() {
     ESP_LOGV(this->get_component_source(), "Value sensors:");
     // Scale values from section 9.7
     {
-      auto buffer = this->read_bytes<10>(detail::to_int(RegisterLocations::ACIN_VOLTAGE_HIGH8));
+      auto buffer = this->read_bytes<10>(detail::to_int(Registers::ACIN_VOLTAGE_HIGH8));
       if (buffer.has_value()) {
-        detail::log_register_bits(this->get_component_source(), RegisterLocations::ACIN_VOLTAGE_HIGH8, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::ACIN_VOLTAGE_HIGH8, buffer.value());
 
         auto acin_voltage = detail::encode_12bit(buffer.value().at(0), buffer.value().at(1));
         this->publish_helper_(SensorType::ACIN_VOLTAGE, remap<float, uint16_t>(acin_voltage, 0x0, 0xFFF, 0, 6.9615));
@@ -182,9 +182,9 @@ void AXP192Component::update() {
     }
 
     {
-      auto buffer = this->read_bytes<10>(detail::to_int(RegisterLocations::BATTERY_TEMP_HIGH8));
+      auto buffer = this->read_bytes<10>(detail::to_int(Registers::BATTERY_TEMP_HIGH8));
       if (buffer.has_value()) {
-        detail::log_register_bits(this->get_component_source(), RegisterLocations::BATTERY_TEMP_HIGH8, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::BATTERY_TEMP_HIGH8, buffer.value());
         auto battery_temp = detail::encode_12bit(buffer.value().at(0), buffer.value().at(1));
         this->publish_helper_(SensorType::BATTERY_TEMP,
                               remap<float, uint16_t>(battery_temp, 0x0, 0xFFF, -144.7, 264.8));
@@ -204,9 +204,9 @@ void AXP192Component::update() {
     }
 
     {
-      auto buffer = this->read_bytes<16>(detail::to_int(RegisterLocations::BATTERY_POWER_HIGH8));
+      auto buffer = this->read_bytes<16>(detail::to_int(Registers::BATTERY_POWER_HIGH8));
       if (buffer.has_value()) {
-        detail::log_register_bits(this->get_component_source(), RegisterLocations::BATTERY_POWER_HIGH8, buffer.value());
+        detail::log_register_bits(this->get_component_source(), Registers::BATTERY_POWER_HIGH8, buffer.value());
 
         auto battery_power = encode_uint24(buffer.value().at(0), buffer.value().at(1), buffer.value().at(2));
         this->publish_helper_(SensorType::BATTERY_POWER, battery_power);
@@ -341,9 +341,9 @@ void AXP192Component::debug_log_register_(Registers reg) {
 bool AXP192Component::configure_ldoio0(bool enable) {
 #ifdef USE_SWITCH
   auto location = this->power_control_.find(OutputPin::OUTPUT_LDOIO0);
-  this->load_register(RegisterLocations::GPIO_CONTROL);
+  this->load_register(Registers::GPIO_CONTROL);
   this->set_ldoio0_mode(enable ? LDOio0Control::LOWNOISE_LDO : LDOio0Control::FLOATING);
-  if (this->save_register(RegisterLocations::GPIO_CONTROL)) {
+  if (this->save_register(Registers::GPIO_CONTROL)) {
     this->update_powercontrol(OutputPin::OUTPUT_LDOIO0, this->get_ldoio0_enabled());
     return true;
   }
@@ -573,7 +573,7 @@ float AXP192Component::get_setup_priority() const { return setup_priority::DATA;
 #ifdef USE_BINARY_SENSOR
 void AXP192Component::do_irqs_() {
   // Read all IRQ registers at once
-  auto buffer = this->read_bytes<4>(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER1));
+  auto buffer = this->read_bytes<4>(detail::to_int(Registers::IRQ_STATUS_REGISTER1));
   if (buffer.has_value()) {
     auto bits = encode_uint32(buffer.value()[0], buffer.value()[1], buffer.value()[2], buffer.value()[3]);
     if (bits != this->last_irq_buffer_) {
@@ -593,16 +593,16 @@ void AXP192Component::do_irqs_() {
       }
       auto output = decode_value(clear_bits);
       if (output[0] > 0) {
-        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER1), output[0]);
+        this->write_byte(detail::to_int(Registers::IRQ_STATUS_REGISTER1), output[0]);
       }
       if (output[1] > 0) {
-        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER2), output[1]);
+        this->write_byte(detail::to_int(Registers::IRQ_STATUS_REGISTER2), output[1]);
       }
       if (output[2] > 0) {
-        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER3), output[2]);
+        this->write_byte(detail::to_int(Registers::IRQ_STATUS_REGISTER3), output[2]);
       }
       if (output[3] > 0) {
-        this->write_byte(detail::to_int(RegisterLocations::IRQ_STATUS_REGISTER4), output[3]);
+        this->write_byte(detail::to_int(Registers::IRQ_STATUS_REGISTER4), output[3]);
       }
       ESP_LOGV(this->get_component_source(),
                "IRQ Register Save: IRQ_STATUS_REGISTER1: 0x%08X, raw: 0x%02X, 0x%02X, 0x%02X, 0x%02X", clear_bits,
@@ -618,35 +618,35 @@ void AXP192Component::enable_irq(IrqType irq) {
   if (detail::to_int(irq) > 0x800000) {
     ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER1 value: 0x%02X, mask: 0x%02X",
              (detail::to_int(irq) >> 24) & 0xFF, ~(detail::to_int(irq) >> 24) & 0xFF);
-    load_register(RegisterLocations::IRQ_ENABLE_REGISTER1);
-    update_register(RegisterLocations::IRQ_ENABLE_REGISTER1, (detail::to_int(irq) >> 24) & 0xFF,
+    load_register(Registers::IRQ_ENABLE_REGISTER1);
+    update_register(Registers::IRQ_ENABLE_REGISTER1, (detail::to_int(irq) >> 24) & 0xFF,
                     ~(detail::to_int(irq) >> 24) & 0xFF);
-    save_register(RegisterLocations::IRQ_ENABLE_REGISTER1);
+    save_register(Registers::IRQ_ENABLE_REGISTER1);
     return;
   }
   if (detail::to_int(irq) > 0x8000) {
     ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER2 value: 0%02X, mask: 0%02X",
              (detail::to_int(irq) >> 16) & 0xFF, ~(detail::to_int(irq) >> 16) & 0xFF);
-    load_register(RegisterLocations::IRQ_ENABLE_REGISTER2);
-    update_register(RegisterLocations::IRQ_ENABLE_REGISTER2, (detail::to_int(irq) >> 16) & 0xFF,
+    load_register(Registers::IRQ_ENABLE_REGISTER2);
+    update_register(Registers::IRQ_ENABLE_REGISTER2, (detail::to_int(irq) >> 16) & 0xFF,
                     ~(detail::to_int(irq) >> 16) & 0xFF);
-    save_register(RegisterLocations::IRQ_ENABLE_REGISTER2);
+    save_register(Registers::IRQ_ENABLE_REGISTER2);
     return;
   }
   if (detail::to_int(irq) > 0x80) {
     ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER3 value: 0%02X, mask: 0%02X",
              (detail::to_int(irq) >> 8) & 0xFF, ~(detail::to_int(irq) >> 8) & 0xFF);
-    load_register(RegisterLocations::IRQ_ENABLE_REGISTER3);
-    update_register(RegisterLocations::IRQ_ENABLE_REGISTER3, (detail::to_int(irq) >> 8) & 0xFF,
+    load_register(Registers::IRQ_ENABLE_REGISTER3);
+    update_register(Registers::IRQ_ENABLE_REGISTER3, (detail::to_int(irq) >> 8) & 0xFF,
                     ~(detail::to_int(irq) >> 8) & 0xFF);
-    save_register(RegisterLocations::IRQ_ENABLE_REGISTER3);
+    save_register(Registers::IRQ_ENABLE_REGISTER3);
     return;
   }
   ESP_LOGV(this->get_component_source(), "IRQ Register Save: IRQ_ENABLE_REGISTER4 value: 0%02X, mask: 0%02X",
            detail::to_int(irq) & 0xFF, ~(detail::to_int(irq) & 0xFF));
-  load_register(RegisterLocations::IRQ_ENABLE_REGISTER4);
-  update_register(RegisterLocations::IRQ_ENABLE_REGISTER4, detail::to_int(irq) & 0xFF, ~(detail::to_int(irq)) & 0xFF);
-  save_register(RegisterLocations::IRQ_ENABLE_REGISTER4);
+  load_register(Registers::IRQ_ENABLE_REGISTER4);
+  update_register(Registers::IRQ_ENABLE_REGISTER4, detail::to_int(irq) & 0xFF, ~(detail::to_int(irq)) & 0xFF);
+  save_register(Registers::IRQ_ENABLE_REGISTER4);
 }
 #endif
 
