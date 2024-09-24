@@ -885,13 +885,15 @@ void AXP192Component::UpdateBrightness()
     }
     switch (this->model_) {
       case AXP192Model::M5STICKC:
-        update_register(RegisterLocations::LDO23_VOLTAGE, (ubri << 4), 0xf);
-        save_register(RegisterLocations::LDO23_VOLTAGE);
+        auto tempbyte this->read_byte(detail::to_int(RegisterLocations::LDO23_VOLTAGE)).value_and(0x0f);
+        tempbyte |= (ubri << 4);
+        this->write_byte(detail::to_int(RegisterLocations::LDO23_VOLTAGE), tempbyte);
         break;
       case AXP192Model::M5CORE2:
       case AXP192Model::M5TOUGH:
-        update_register(RegisterLocations::DCDC3_VOLTAGE, (ubri << 3), 0x80);
-        save_register(RegisterLocations::DCDC3_VOLTAGE);
+        auto tempbyte this->read_byte(detail::to_int(RegisterLocations::DCDC3_VOLTAGE)).value_and(0x80);
+        tempbyte |= (ubri << 3);
+        this->write_byte(detail::to_int(RegisterLocations::DCDC3_VOLTAGE), tempbyte);
         break;
     }
     if (tempBrightness == 0) {
