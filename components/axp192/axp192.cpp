@@ -36,7 +36,7 @@ namespace axp192 {
     std::string format_bits(uint8_t byte) { return std::string{"0b"} + bit_rep[byte >> 4] + bit_rep[byte & 0x0F]; }
 
     template<size_t N>
-    void log_register_bits(const char *const tag, RegisterLocations reg, const std::array<uint8_t, N> &bytes) {
+    void log_register_bits(const char *const tag, Registers reg, const std::array<uint8_t, N> &bytes) {
       auto regnum = detail::to_int(reg);
       ESP_LOGV(tag, "Register bytes starting at 0x%02X", regnum);
       for (int idx = 0; idx < N; idx++) {
@@ -89,12 +89,12 @@ void AXP192Component::setup()
 }
 
 void AXP192Component::update() {
-    this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
-    this->debug_log_register_(RegisterLocations::DCDC2_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::DCDC1_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::DCDC3_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::LDO23_VOLTAGE);
-    this->debug_log_register_(RegisterLocations::GPIO_LDO_VOLTAGE);
+    this->debug_log_register_(Registers::DCDC13_LDO23_CONTROL);
+    this->debug_log_register_(Registers::DCDC2_VOLTAGE);
+    this->debug_log_register_(Registers::DCDC1_VOLTAGE);
+    this->debug_log_register_(Registers::DCDC3_VOLTAGE);
+    this->debug_log_register_(Registers::LDO23_VOLTAGE);
+    this->debug_log_register_(Registers::GPIO_LDO_VOLTAGE);
     this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
     this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
@@ -273,7 +273,7 @@ bool AXP192Component::configure_axp() {
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-bool AXP192Component::update_register(RegisterLocations reg, uint8_t value, uint8_t clear_mask) {
+bool AXP192Component::update_register(Registers reg, uint8_t value, uint8_t clear_mask) {
   auto location = this->registers_.find(reg);
   if (location != this->registers_.end()) {
     location->second &= clear_mask;
@@ -282,7 +282,7 @@ bool AXP192Component::update_register(RegisterLocations reg, uint8_t value, uint
   return location != this->registers_.end();
 }
 
-bool AXP192Component::load_register(RegisterLocations reg) {
+bool AXP192Component::load_register(Registers reg) {
   auto location = this->registers_.find(reg);
   if (location == this->registers_.end()) {
     return false;
@@ -296,7 +296,7 @@ bool AXP192Component::load_register(RegisterLocations reg) {
   return contents.has_value();
 }
 
-bool AXP192Component::save_register(RegisterLocations reg) {
+bool AXP192Component::save_register(Registers reg) {
   auto location = this->registers_.find(reg);
   if (location == this->registers_.end()) {
     return false;
@@ -328,7 +328,7 @@ void AXP192Component::dump_config() {
   }
 }
 
-void AXP192Component::debug_log_register_(RegisterLocations reg) {
+void AXP192Component::debug_log_register_(Registers reg) {
   auto val = this->read_byte(detail::to_int(reg));
   if (val.has_value()) {
     ESP_LOGD(this->get_component_source(), "Read %s from 0x%X", detail::format_bits(val.value()).c_str(),
@@ -352,91 +352,91 @@ bool AXP192Component::configure_ldoio0(bool enable) {
 }
 
 void AXP192Component::set_voff(VoffVoltage voff) {
-  this->update_register(RegisterLocations::VOFF_VOLTAGE, detail::to_int(voff), 0b11111000);
+  this->update_register(Registers::VOFF_VOLTAGE, detail::to_int(voff), 0b11111000);
 }
 
 void AXP192Component::set_charge_voltage(ChargeVoltage voltage) {
-  this->update_register(RegisterLocations::CHARGE_CONTROL_REG1, detail::to_int(voltage), 0b10011111);
+  this->update_register(Registers::CHARGE_CONTROL_REG1, detail::to_int(voltage), 0b10011111);
 }
 
 void AXP192Component::set_charge_current(ChargeCurrent current) {
-  this->update_register(RegisterLocations::CHARGE_CONTROL_REG1, detail::to_int(current), 0b11110000);
+  this->update_register(Registers::CHARGE_CONTROL_REG1, detail::to_int(current), 0b11110000);
 }
 
 void AXP192Component::set_vbus_ipsout(VBusIpsout val) {
-  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b01111111);
+  this->update_register(Registers::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b01111111);
 }
 
 void AXP192Component::set_vbus_hold_current_limited(VBusHoldCurrentLimited val) {
-  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11111101);
+  this->update_register(Registers::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11111101);
 }
 
 void AXP192Component::set_vbus_hold_current_limit(VBusHoldCurrentLimit val) {
-  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11111110);
+  this->update_register(Registers::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11111110);
 }
 
 void AXP192Component::set_vbus_hold_voltage_limited(VBusHoldVoltageLimited val) {
-  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b10111111);
+  this->update_register(Registers::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b10111111);
 }
 
 void AXP192Component::set_vbus_hold_voltage_limit(VBusHoldVoltageLimit val) {
-  this->update_register(RegisterLocations::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11000111);
+  this->update_register(Registers::VBUS_IPSOUT_ACCESS, detail::to_int(val), 0b11000111);
 }
 
 void AXP192Component::set_disable_rtc(bool disable_rtc) {
-  this->update_register(RegisterLocations::BATTERY_BACKUP_CONTROL, disable_rtc ? 0x0 : 0b10000000, 0b11000111);
+  this->update_register(Registers::BATTERY_BACKUP_CONTROL, disable_rtc ? 0x0 : 0b10000000, 0b11000111);
 }
 
 void AXP192Component::set_disable_ldo2(bool disable_ldo2) {
-  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_ldo2 ? 0x0 : 0b00000100, 0b11111011);
+  this->update_register(Registers::DCDC13_LDO23_CONTROL, disable_ldo2 ? 0x0 : 0b00000100, 0b11111011);
 }
 
 void AXP192Component::set_disable_ldo3(bool disable_ldo3) {
-  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_ldo3 ? 0x0 : 0b11110111, 0b00001000);
+  this->update_register(Registers::DCDC13_LDO23_CONTROL, disable_ldo3 ? 0x0 : 0b11110111, 0b00001000);
 }
 
 void AXP192Component::set_disable_dcdc1(bool disable_dcdc1) {
-  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_dcdc1 ? 0x0 : 0b00000010, 0b11111101);
+  this->update_register(Registers::DCDC13_LDO23_CONTROL, disable_dcdc1 ? 0x0 : 0b00000010, 0b11111101);
 }
 
 void AXP192Component::set_disable_dcdc3(bool disable_dcdc3) {
-  this->update_register(RegisterLocations::DCDC13_LDO23_CONTROL, disable_dcdc3 ? 0x0 : 0b00000001, 0b11111110);
+  this->update_register(Registers::DCDC13_LDO23_CONTROL, disable_dcdc3 ? 0x0 : 0b00000001, 0b11111110);
 }
 
 void AXP192Component::set_dcdc1_voltage(uint32_t dcdc1_voltage) {
-  this->update_register(RegisterLocations::DCDC1_VOLTAGE,
+  this->update_register(Registers::DCDC1_VOLTAGE,
                         detail::constrained_remap<uint32_t, 700, 3500, 0x0, 0x7F>(dcdc1_voltage), 0b10000000);
 }
 
 void AXP192Component::set_dcdc3_voltage(uint32_t dcdc3_voltage) {
-  this->update_register(RegisterLocations::DCDC3_VOLTAGE,
+  this->update_register(Registers::DCDC3_VOLTAGE,
                         detail::constrained_remap<uint32_t, 700, 3500, 0x0, 0x7F>(dcdc3_voltage), 0b10000000);
 }
 
 void AXP192Component::set_ldo2_voltage(uint32_t ldo2_voltage) {
-  this->update_register(RegisterLocations::LDO23_VOLTAGE,
+  this->update_register(Registers::LDO23_VOLTAGE,
                         (detail::constrained_remap<int, 1800, 3300, 0x0, 0x0F>(ldo2_voltage) << 4), 0b00001111);
 }
 
 void AXP192Component::set_ldo3_voltage(uint32_t ldo3_voltage) {
-  this->update_register(RegisterLocations::LDO23_VOLTAGE,
+  this->update_register(Registers::LDO23_VOLTAGE,
                         detail::constrained_remap<uint32_t, 1800, 3300, 0x0, 0x0F>(ldo3_voltage), 0b11110000);
 }
 
 void AXP192Component::set_ldoio0_voltage(uint32_t ldoio0_voltage) {
-  this->update_register(RegisterLocations::GPIO_LDO_VOLTAGE,
+  this->update_register(Registers::GPIO_LDO_VOLTAGE,
                         (detail::constrained_remap<uint32_t, 1800, 3300, 0x0, 0x0F>(ldoio0_voltage) << 4), 0b00001111);
 }
 
 void AXP192Component::set_ldoio0_mode(LDOio0Control mode) {
-  this->update_register(RegisterLocations::GPIO_CONTROL, detail::to_int(mode), 0b11111000);
+  this->update_register(Registers::GPIO_CONTROL, detail::to_int(mode), 0b11111000);
 }
 
 bool AXP192Component::configure_ldo2(bool enable) {
-  this->debug_log_register_(RegisterLocations::DCDC13_LDO23_CONTROL);
-  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->debug_log_register_(Registers::DCDC13_LDO23_CONTROL);
+  this->load_register(Registers::DCDC13_LDO23_CONTROL);
   this->set_disable_ldo2(!enable);
-  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+  if (this->save_register(Registers::DCDC13_LDO23_CONTROL)) {
     this->update_powercontrol(OutputPin::OUTPUT_LDO2, this->get_ldo2_enabled());
     return true;
   }
@@ -444,9 +444,9 @@ bool AXP192Component::configure_ldo2(bool enable) {
 }
 
 bool AXP192Component::configure_ldo3(bool enable) {
-  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->load_register(Registers::DCDC13_LDO23_CONTROL);
   this->set_disable_ldo3(!enable);
-  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+  if (this->save_register(Registers::DCDC13_LDO23_CONTROL)) {
     this->update_powercontrol(OutputPin::OUTPUT_LDO3, this->get_ldo3_enabled());
     return true;
   }
@@ -454,9 +454,9 @@ bool AXP192Component::configure_ldo3(bool enable) {
 }
 
 bool AXP192Component::configure_dcdc1(bool enable) {
-  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->load_register(Registers::DCDC13_LDO23_CONTROL);
   this->set_disable_dcdc1(!enable);
-  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+  if (this->save_register(Registers::DCDC13_LDO23_CONTROL)) {
     this->update_powercontrol(OutputPin::OUTPUT_DCDC1, this->get_dcdc1_enabled());
     return true;
   }
@@ -464,9 +464,9 @@ bool AXP192Component::configure_dcdc1(bool enable) {
 }
 
 bool AXP192Component::configure_dcdc3(bool enable) {
-  this->load_register(RegisterLocations::DCDC13_LDO23_CONTROL);
+  this->load_register(Registers::DCDC13_LDO23_CONTROL);
   this->set_disable_dcdc3(!enable);
-  if (this->save_register(RegisterLocations::DCDC13_LDO23_CONTROL)) {
+  if (this->save_register(Registers::DCDC13_LDO23_CONTROL)) {
     this->update_powercontrol(OutputPin::OUTPUT_DCDC3, this->get_dcdc3_enabled());
     return true;
   }
@@ -475,97 +475,97 @@ bool AXP192Component::configure_dcdc3(bool enable) {
 
 bool AXP192Component::configure_ldo2_voltage(float level) {
   auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 1800, 3300);
-  this->load_register(RegisterLocations::LDO23_VOLTAGE);
+  this->load_register(Registers::LDO23_VOLTAGE);
   this->set_ldo2_voltage(scaled);
-  return this->save_register(RegisterLocations::LDO23_VOLTAGE);
+  return this->save_register(Registers::LDO23_VOLTAGE);
 }
 
 bool AXP192Component::configure_ldo3_voltage(float level) {
   auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 1800, 3300);
-  this->load_register(RegisterLocations::LDO23_VOLTAGE);
+  this->load_register(Registers::LDO23_VOLTAGE);
   this->set_ldo3_voltage(scaled);
-  return this->save_register(RegisterLocations::LDO23_VOLTAGE);
+  return this->save_register(Registers::LDO23_VOLTAGE);
 }
 
 bool AXP192Component::configure_dcdc1_voltage(float level) {
   auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 700, 3500);
-  this->load_register(RegisterLocations::DCDC1_VOLTAGE);
+  this->load_register(Registers::DCDC1_VOLTAGE);
   this->set_dcdc1_voltage(scaled);
-  return this->save_register(RegisterLocations::DCDC1_VOLTAGE);
+  return this->save_register(Registers::DCDC1_VOLTAGE);
 }
 
 bool AXP192Component::configure_dcdc3_voltage(float level) {
   auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 700, 3500);
-  this->load_register(RegisterLocations::DCDC3_VOLTAGE);
+  this->load_register(Registers::DCDC3_VOLTAGE);
   this->set_dcdc3_voltage(scaled);
-  return this->save_register(RegisterLocations::DCDC3_VOLTAGE);
+  return this->save_register(Registers::DCDC3_VOLTAGE);
 }
 
 bool AXP192Component::configure_ldoio0_voltage(float level) {
   auto scaled = remap<float, uint32_t>(level, 0.0f, 1.0f, 1800, 3300);
-  this->load_register(RegisterLocations::GPIO_LDO_VOLTAGE);
+  this->load_register(Registers::GPIO_LDO_VOLTAGE);
   this->set_ldoio0_voltage(scaled);
-  return this->save_register(RegisterLocations::GPIO_LDO_VOLTAGE);
+  return this->save_register(Registers::GPIO_LDO_VOLTAGE);
 }
 
 bool AXP192Component::get_ldo2_enabled() {
-  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00000100) != 0;
+  return (this->registers_.at(Registers::DCDC13_LDO23_CONTROL) & 0b00000100) != 0;
 }
 
 bool AXP192Component::get_ldo3_enabled() {
-  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00001000) != 0;
+  return (this->registers_.at(Registers::DCDC13_LDO23_CONTROL) & 0b00001000) != 0;
 }
 
 bool AXP192Component::get_dcdc1_enabled() {
-  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00000001) != 0;
+  return (this->registers_.at(Registers::DCDC13_LDO23_CONTROL) & 0b00000001) != 0;
 }
 
 bool AXP192Component::get_dcdc3_enabled() {
-  return (this->registers_.at(RegisterLocations::DCDC13_LDO23_CONTROL) & 0b00000010) != 0;
+  return (this->registers_.at(Registers::DCDC13_LDO23_CONTROL) & 0b00000010) != 0;
 }
 
 bool AXP192Component::get_ldoio0_enabled() {
-  return (this->registers_.at(RegisterLocations::GPIO_CONTROL) & 0b00000111) == 0b00000010;
+  return (this->registers_.at(Registers::GPIO_CONTROL) & 0b00000111) == 0b00000010;
 }
 
 float AXP192Component::get_ldo2_voltage() {
-  auto raw = (this->registers_.at(RegisterLocations::LDO23_VOLTAGE) & 0b11110000) >> 4;
+  auto raw = (this->registers_.at(Registers::LDO23_VOLTAGE) & 0b11110000) >> 4;
   return remap<float, uint8_t>(raw, 0, 0x0F, 0, 100);
 }
 
 float AXP192Component::get_ldo3_voltage() {
-  auto raw = (this->registers_.at(RegisterLocations::LDO23_VOLTAGE) & 0b00001111);
+  auto raw = (this->registers_.at(Registers::LDO23_VOLTAGE) & 0b00001111);
   return remap<float, uint8_t>(raw, 0, 0x0F, 0, 100);
 }
 
 float AXP192Component::get_dcdc1_voltage() {
-  auto raw = (this->registers_.at(RegisterLocations::DCDC1_VOLTAGE) & 0b01111111);
+  auto raw = (this->registers_.at(Registers::DCDC1_VOLTAGE) & 0b01111111);
   return remap<float, uint8_t>(raw, 0, 0x7F, 0, 100);
 }
 
 float AXP192Component::get_dcdc3_voltage() {
-  auto raw = (this->registers_.at(RegisterLocations::DCDC3_VOLTAGE) & 0b01111111);
+  auto raw = (this->registers_.at(Registers::DCDC3_VOLTAGE) & 0b01111111);
   return remap<float, uint8_t>(raw, 0, 0x7F, 0, 100);
 }
 
 float AXP192Component::get_ldoio0_voltage() {
-  auto raw = (this->registers_.at(RegisterLocations::GPIO_LDO_VOLTAGE) & 0b11110000) >> 4;
+  auto raw = (this->registers_.at(Registers::GPIO_LDO_VOLTAGE) & 0b11110000) >> 4;
   return remap<float, uint8_t>(raw, 0, 0x0F, 0, 100);
 }
 
 void AXP192Component::set_dcdc2_voltage(uint32_t dcdc2_voltage) {
-  this->update_register(RegisterLocations::DCDC2_VOLTAGE,
+  this->update_register(Registers::DCDC2_VOLTAGE,
                         detail::constrained_remap<uint32_t, 700, 2275, 0x0, 0x3F>(dcdc2_voltage), 0b11000000);
 }
 
 void AXP192Component::set_disable_dcdc2(bool disable_dcdc2) {
-  this->update_register(RegisterLocations::EXTEN_DCDC2_CONTROL, disable_dcdc2 ? 0x0 : 0b00000101, 0b11111010);
+  this->update_register(Registers::EXTEN_DCDC2_CONTROL, disable_dcdc2 ? 0x0 : 0b00000101, 0b11111010);
 }
 
 bool AXP192Component::configure_dcdc2(bool enable) {
-  this->load_register(RegisterLocations::EXTEN_DCDC2_CONTROL);
+  this->load_register(Registers::EXTEN_DCDC2_CONTROL);
   this->set_disable_dcdc2(!enable);
-  return this->save_register(RegisterLocations::EXTEN_DCDC2_CONTROL);
+  return this->save_register(Registers::EXTEN_DCDC2_CONTROL);
 }
 
 float AXP192Component::get_setup_priority() const { return setup_priority::DATA; }
@@ -724,87 +724,76 @@ void AXP192Component::begin(bool disableLDO2, bool disableLDO3, bool disableRTC,
 {
   switch (this->model_) {
     case AXP192Model::M5STICKC:
-    {
         // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
-        WriteByte(0x28, 0xcc);
+        WriteByte(Registers::LDO23_VOLTAGE, 0xcc);
         break;
-    }
     case AXP192Model::M5CORE2:
-    {
-        // Set DCDC3 (TFT_LED & TFT) 3.0V
-        WriteByte(0x27, 0xcc);
-        // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
-        WriteByte(0x28, 0xcc);
-        break;
-    }
     case AXP192Model::M5TOUGH:
-    {
         // Set DCDC3 (TFT_LED & TFT) 3.0V
-        WriteByte(0x27, 0xcc);
+        WriteByte(Registers::DCDC3_VOLTAGE, 0xcc);
         // Set LDO2 & LDO3(TFT_LED & TFT) 3.0V
-        WriteByte(0x28, 0xcc);
+        WriteByte(Registers::LDO23_VOLTAGE, 0xcc);
         break;
-    }
   }
 
     // Set ADC sample rate to 200hz
-    WriteByte(0x84, 0b11110010);
+    WriteByte(Registers::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0b11110010);
 
     // Set ADC to All Enable
-    WriteByte(0x82, 0xff);
+    WriteByte(Registers::ADC_ENABLE_REGISTER1, 0xff);
 
     // Bat charge voltage to 4.2, Current 100MA
-    WriteByte(0x33, 0xc0);
+    WriteByte(Registers::CHARGE_CONTROL_REG1, 0xc0);
 
     // Depending on configuration enable LDO2, LDO3, DCDC1, DCDC3.
-    uint8_t buf = (Read8bit(0x12) & 0xef) | 0x4D;
+    uint8_t buf = (Read8bit(Registers::DCDC13_LDO23_CONTROL) & 0xef) | 0x4D;
     if(disableLDO3) buf &= ~(1<<3);
     if(disableLDO2) buf &= ~(1<<2);
     if(disableDCDC3) buf &= ~(1<<1);
     if(disableDCDC1) buf &= ~(1<<0);
-    WriteByte(0x12, buf);
+    WriteByte(Registers::DCDC13_LDO23_CONTROL, buf);
 
     // 128ms power on, 4s power off
-    WriteByte(0x36, 0x0C);
+    WriteByte(Registers::PEK_PARAMETERS, 0x0C);
 
     if(!disableRTC)
     {
         // Set RTC voltage to 3.3V
-        WriteByte(0x91, 0xF0);
+        WriteByte(Registers::GPIO_LDO_VOLTAGE, 0xF0);
 
         // Set GPIO0 to LDO
-        WriteByte(0x90, 0x02);
+        WriteByte(Registers::GPIO_CONTROL, 0x02);
     }
 
     // Disable vbus hold limit
-    WriteByte(0x30, 0x80);
+    WriteByte(Registers::VBUS_IPSOUT_ACCESS, 0x80);
 
     // Set temperature protection
-    WriteByte(0x39, 0xfc);
+    WriteByte(Registers::BATTERY_CHARGE_OVERTEMP_VALUE, 0xfc);
 
     // Enable RTC BAT charge
-    WriteByte(0x35, 0xa2 & (disableRTC ? 0x7F : 0xFF));
+    WriteByte(Registers::BATTERY_BACKUP_CONTROL, 0xa2 & (disableRTC ? 0x7F : 0xFF));
 
     // Enable bat detection
-    WriteByte(0x32, 0x46);
+    WriteByte(Registers::POWEROFF_BATTERY_CHLED_CONTROL, 0x46);
 
 }
 
-void AXP192Component::WriteByte( RegisterLocations reg , uint8_t data) {
+void AXP192Component::WriteByte( Registers reg , uint8_t data) {
   this->write_byte(static_cast<uint8_t>(reg), data);
 }
 
-uint8_t AXP192Component::Read8bit( RegisterLocations reg ) {
+uint8_t AXP192Component::Read8bit( Registers reg ) {
   uint8_t data;
   this->read_byte(static_cast<uint8_t>(reg), &data);
   return data;
 }
 
-void AXP192Component::ReadBuf( RegisterLocations reg , uint8_t length, uint8_t *output) {
+void AXP192Component::ReadBuf( Registers reg , uint8_t length, uint8_t *output) {
   this->read_bytes(static_cast<uint8_t>(reg), output, length);
 }
 
-uint16_t AXP192Component::Read12bit( RegisterLocations reg ) {
+uint16_t AXP192Component::Read12bit( Registers reg ) {
   uint16_t data = 0;
   uint8_t buf[2];
   ReadBuf(reg, 2, buf);
@@ -812,7 +801,7 @@ uint16_t AXP192Component::Read12bit( RegisterLocations reg ) {
   return data;
 }
 
-uint16_t AXP192Component::Read13bit( RegisterLocations reg ) {
+uint16_t AXP192Component::Read13bit( Registers reg ) {
   uint16_t data = 0;
   uint8_t buf[2];
   ReadBuf(reg, 2, buf);
@@ -820,7 +809,7 @@ uint16_t AXP192Component::Read13bit( RegisterLocations reg ) {
   return data;
 }
 
-uint16_t AXP192Component::Read16bit( RegisterLocations reg ) {
+uint16_t AXP192Component::Read16bit( Registers reg ) {
   uint16_t data = 0;
   uint8_t buf[2];
   ReadBuf(reg, 2, buf);
@@ -828,7 +817,7 @@ uint16_t AXP192Component::Read16bit( RegisterLocations reg ) {
   return data;
 }
 
-uint32_t AXP192Component::Read24bit( RegisterLocations reg ) {
+uint32_t AXP192Component::Read24bit( Registers reg ) {
   uint32_t data = 0;
   uint8_t buf[3];
   ReadBuf(reg, 3, buf);
@@ -836,7 +825,7 @@ uint32_t AXP192Component::Read24bit( RegisterLocations reg ) {
   return data;
 }
 
-uint32_t AXP192Component::Read32bit( RegisterLocations reg ) {
+uint32_t AXP192Component::Read32bit( Registers reg ) {
   uint32_t data = 0;
   uint8_t buf[4];
   ReadBuf(reg, 4, buf);
@@ -866,17 +855,17 @@ void AXP192Component::UpdateBrightness()
     }
     switch (this->model_) {
       case AXP192Model::M5STICKC:
-        tempByte = this->Read8bit(RegisterLocations::LDO23_VOLTAGE);
+        tempByte = this->Read8bit(Registers::LDO23_VOLTAGE);
         tempByte &= 0x0f;
         tempByte |= (ubri << 4);
-        this->WriteByte(RegisterLocations::LDO23_VOLTAGE, tempByte);
+        this->WriteByte(Registers::LDO23_VOLTAGE, tempByte);
         break;
       case AXP192Model::M5CORE2:
       case AXP192Model::M5TOUGH:
-        tempByte = this->Read8bit(RegisterLocations::DCDC3_VOLTAGE);
+        tempByte = this->Read8bit(Registers::DCDC3_VOLTAGE);
         tempByte &= 0x80;
         tempByte |= (ubri << 3);
-        this->WriteByte(RegisterLocations::DCDC3_VOLTAGE, tempByte);
+        this->WriteByte(Registers::DCDC3_VOLTAGE, tempByte);
         break;
     }
     if (tempBrightness == 0) {
@@ -889,7 +878,7 @@ void AXP192Component::UpdateBrightness()
 
 bool AXP192Component::GetBatState()
 {
-    if( Read8bit(0x01) | 0x20 )
+    if( Read8bit(Registers::POWER_SUPPLY_CHARGE_STATUS) | 0x20 )
         return true;
     else
         return false;
@@ -898,7 +887,7 @@ bool AXP192Component::GetBatState()
 bool AXP192Component::GetChargingState()
 {
     // reading 0x00 bit 6
-    if( (Read8bit(0x01) >> 5) & 0x01 )
+    if( (Read8bit(Registers::POWER_SUPPLY_CHARGE_STATUS) >> 5) & 0x01 )
         return true;
     else
         return false;
@@ -906,7 +895,9 @@ bool AXP192Component::GetChargingState()
 
 uint8_t AXP192Component::GetBatData()
 {
-    return Read8bit(0x75);
+    //return Read8bit(0x75);
+    error("Something's wrong here");
+    return 0;
 }
 //---------coulombcounter_from_here---------
 //enable: void EnableCoulombcounter(void);
@@ -917,34 +908,29 @@ uint8_t AXP192Component::GetBatData()
 //get discharge data: uint32_t GetCoulombdischargeData(void);
 //get coulomb val affter calculation: float GetCoulombData(void);
 //------------------------------------------
-void  AXP192Component::EnableCoulombcounter(void)
-{
-    WriteByte( 0xB8 , 0x80 );
+void  AXP192Component::EnableCoulombcounter(void) {
+  WriteByte( Registers::BATTERY_COULUMB_COUNTER_CONTROL , 0x80 );
 }
 
-void  AXP192Component::DisableCoulombcounter(void)
-{
-    WriteByte( 0xB8 , 0x00 );
+void  AXP192Component::DisableCoulombcounter(void) {
+  WriteByte( Registers::BATTERY_COULUMB_COUNTER_CONTROL , 0x00 );
 }
 
-void  AXP192Component::StopCoulombcounter(void)
-{
-    WriteByte( 0xB8 , 0xC0 );
+void  AXP192Component::StopCoulombcounter(void) {
+  WriteByte( Registers::BATTERY_COULUMB_COUNTER_CONTROL , 0xC0 );
 }
 
-void  AXP192Component::ClearCoulombcounter(void)
-{
-    WriteByte( 0xB8 , 0xA0 );
+void  AXP192Component::ClearCoulombcounter(void) {
+  WriteByte( Registers::BATTERY_COULUMB_COUNTER_CONTROL , 0xA0 );
 }
 
-uint32_t AXP192Component::GetCoulombchargeData(void)
-{
-    return Read32bit(0xB0);
+uint32_t AXP192Component::GetCoulombchargeData(void) {
+  return Read32bit(Registers::BATTERY_CHARGE_COULUMB_COUNTER3);
 }
 
 uint32_t AXP192Component::GetCoulombdischargeData(void)
 {
-    return Read32bit(0xB4);
+    return Read32bit(Registers::BATTERY_DISCHARGE_COULUMB_COUNTER3);
 }
 
 float AXP192Component::GetCoulombData(void)
@@ -964,102 +950,61 @@ float AXP192Component::GetCoulombData(void)
 }
 //----------coulomb_end_at_here----------
 
-uint16_t AXP192Component::GetVbatData(void){
-
-    uint16_t vbat = 0;
-    uint8_t buf[2];
-    ReadBuf(0x78,2,buf);
-    vbat = ((buf[0] << 4) + buf[1]); // V
-    return vbat;
+uint16_t AXP192Component::GetVbatData(void) {
+    return Read12bit(Registers::BATTERY_VOLTAGE_12BIT_BASE);
 }
 
 uint16_t AXP192Component::GetVinData(void)
 {
-    uint16_t vin = 0;
-    uint8_t buf[2];
-    ReadBuf(0x56,2,buf);
-    vin = ((buf[0] << 4) + buf[1]); // V
-    return vin;
+  return Read12bit(Registers::ACIN_VOLTAGE_12BIT_BASE);
 }
 
 uint16_t AXP192Component::GetIinData(void)
 {
-    uint16_t iin = 0;
-    uint8_t buf[2];
-    ReadBuf(0x58,2,buf);
-    iin = ((buf[0] << 4) + buf[1]);
-    return iin;
+  return Read12bit(Registers::ACIN_CURRENT_12BIT_BASE);
 }
 
 uint16_t AXP192Component::GetVusbinData(void)
 {
-    uint16_t vin = 0;
-    uint8_t buf[2];
-    ReadBuf(0x5a,2,buf);
-    vin = ((buf[0] << 4) + buf[1]); // V
-    return vin;
+  return Read12bit(Registers::VBUS_VOLTAGE_12BIT_BASE);
 }
 
 uint16_t AXP192Component::GetIusbinData(void)
 {
-    uint16_t iin = 0;
-    uint8_t buf[2];
-    ReadBuf(0x5C,2,buf);
-    iin = ((buf[0] << 4) + buf[1]);
-    return iin;
+  return Read12bit(Registers::VBUS_CURRENT_12BIT_BASE);
 }
 
 uint16_t AXP192Component::GetIchargeData(void)
 {
-    uint16_t icharge = 0;
-    uint8_t buf[2];
-    ReadBuf(0x7A,2,buf);
-    icharge = ( buf[0] << 5 ) + buf[1] ;
-    return icharge;
+  return Read13bit(Registers::BATTERY_CHARGE_CURRENT_13BIT_BASE);
 }
 
 uint16_t AXP192Component::GetIdischargeData(void)
 {
-    uint16_t idischarge = 0;
-    uint8_t buf[2];
-    ReadBuf(0x7C,2,buf);
-    idischarge = ( buf[0] << 5 ) + buf[1] ;
-    return idischarge;
+  return Read13bit(Registers::BATTERY_DISCHARGE_CURRENT_13BIT_BASE);
 }
 
 uint16_t AXP192Component::GetTempData(void)
 {
-    uint16_t temp = 0;
-    uint8_t buf[2];
-    ReadBuf(0x5e,2,buf);
-    temp = ((buf[0] << 4) + buf[1]);
-    return temp;
+  return Read12bit(Registers::AXP_TEMP_12BIT_BASE);
 }
 
 uint32_t AXP192Component::GetPowerbatData(void)
 {
-    uint32_t power = 0;
-    uint8_t buf[3];
-    ReadBuf(0x70,2,buf);
-    power = (buf[0] << 16) + (buf[1] << 8) + buf[2];
-    return power;
+  return Read24bit(Registers::BATTERY_POWER_24BIT_BASE);
 }
 
 uint16_t AXP192Component::GetVapsData(void)
 {
-    uint16_t vaps = 0;
-    uint8_t buf[2];
-    ReadBuf(0x7e,2,buf);
-    vaps = ((buf[0] << 4) + buf[1]);
-    return vaps;
+  return Read12bit(Registers::APS_VOLTAGE_12BIT_BASE);
 }
 
 void AXP192Component::SetSleep(void)
 {
-    WriteByte(0x31 , Read8bit(0x31) | ( 1 << 3)); // Power off voltag 3.0v
-    WriteByte(0x90 , Read8bit(0x90) | 0x07); // GPIO1 floating
-    WriteByte(0x82, 0x00); // Disable ADCs
-    WriteByte(0x12, Read8bit(0x12) & 0xA1); // Disable all outputs but DCDC1
+    //Write1Byte(0x31 , Read8bit(0x31) | ( 1 << 3)); // Power off voltag 3.0v
+    //Write1Byte(0x90 , Read8bit(0x90) | 0x07); // GPIO1 floating
+    //Write1Byte(0x82, 0x00); // Disable ADCs
+    //Write1Byte(0x12, Read8bit(0x12) & 0xA1); // Disable all outputs but DCDC1
 }
 
 // -- sleep
@@ -1094,59 +1039,59 @@ void AXP192Component::LightSleep(uint64_t time_in_us)
 // 0 not press, 0x01 long press, 0x02 press
 uint8_t AXP192Component::GetBtnPress()
 {
-    uint8_t state = Read8bit(0x46);
+    uint8_t state = Read8bit(Registers::IRQ_STATUS_REGISTER3);
     if(state)
     {
-        WriteByte( 0x46 , 0x03 );
+        WriteByte( Registers::IRQ_STATUS_REGISTER3 , 0x03 );
     }
     return state;
 }
 
 uint8_t AXP192Component::GetWarningLevel(void)
 {
-    return Read8bit(0x47) & 0x01;
+    return Read8bit(Registers::IRQ_STATUS_REGISTER4) & 0x01;
 }
 
 float AXP192Component::GetBatVoltage()
 {
     float ADCLSB = 1.1 / 1000.0;
-    uint16_t ReData = Read12bit( 0x78 );
+    uint16_t ReData = Read12bit( Registers::BATTERY_VOLTAGE_12BIT_BASE );
     return ReData * ADCLSB;
 }
 
 float AXP192Component::GetBatCurrent()
 {
     float ADCLSB = 0.5;
-    uint16_t CurrentIn = Read13bit( 0x7A );
-    uint16_t CurrentOut = Read13bit( 0x7C );
+    uint16_t CurrentIn = Read13bit( Registers::BATTERY_CHARGE_CURRENT_13BIT_BASE );
+    uint16_t CurrentOut = Read13bit( Registers::BATTERY_DISCHARGE_CURRENT_13BIT_BASE );
     return ( CurrentIn - CurrentOut ) * ADCLSB;
 }
 
 float AXP192Component::GetVinVoltage()
 {
     float ADCLSB = 1.7 / 1000.0;
-    uint16_t ReData = Read12bit( 0x56 );
+    uint16_t ReData = Read12bit( Registers::ACIN_VOLTAGE_12BIT_BASE );
     return ReData * ADCLSB;
 }
 
 float AXP192Component::GetVinCurrent()
 {
     float ADCLSB = 0.625;
-    uint16_t ReData = Read12bit( 0x58 );
+    uint16_t ReData = Read12bit( Registers::ACIN_CURRENT_12BIT_BASE );
     return ReData * ADCLSB;
 }
 
 float AXP192Component::GetVBusVoltage()
 {
     float ADCLSB = 1.7 / 1000.0;
-    uint16_t ReData = Read12bit( 0x5A );
+    uint16_t ReData = Read12bit( Registers::VBUS_VOLTAGE_12BIT_BASE );
     return ReData * ADCLSB;
 }
 
 float AXP192Component::GetVBusCurrent()
 {
     float ADCLSB = 0.375;
-    uint16_t ReData = Read12bit( 0x5C );
+    uint16_t ReData = Read12bit( Registers::VBUS_CURRENT_12BIT_BASE );
     return ReData * ADCLSB;
 }
 
@@ -1154,7 +1099,7 @@ float AXP192Component::GetTempInAXP192()
 {
     float ADCLSB = 0.1;
     const float OFFSET_DEG_C = -144.7;
-    uint16_t ReData = Read12bit( 0x5E );
+    uint16_t ReData = Read12bit( Registers::AXP_TEMP_12BIT_BASE );
     return OFFSET_DEG_C + ReData * ADCLSB;
 }
 
@@ -1162,44 +1107,44 @@ float AXP192Component::GetBatPower()
 {
     float VoltageLSB = 1.1;
     float CurrentLCS = 0.5;
-    uint32_t ReData = Read24bit( 0x70 );
+    uint32_t ReData = Read24bit( Registers::BATTERY_POWER_24BIT_BASE );
     return  VoltageLSB * CurrentLCS * ReData/ 1000.0;
 }
 
 float AXP192Component::GetBatChargeCurrent()
 {
     float ADCLSB = 0.5;
-    uint16_t ReData = Read13bit( 0x7A );
+    uint16_t ReData = Read13bit( Registers::BATTERY_CHARGE_CURRENT_13BIT_BASE );
     return ReData * ADCLSB;
 }
 
 float AXP192Component::GetAPSVoltage()
 {
     float ADCLSB = 1.4  / 1000.0;
-    uint16_t ReData = Read12bit( 0x7E );
+    uint16_t ReData = Read12bit( Registers::APS_VOLTAGE_12BIT_BASE );
     return ReData * ADCLSB;
 }
 
 float AXP192Component::GetBatCoulombInput()
 {
-    uint32_t ReData = Read32bit( 0xB0 );
+    uint32_t ReData = Read32bit( Registers::BATTERY_CHARGE_COULUMB_COUNTER_32BIT_BASE );
     return ReData * 65536 * 0.5 / 3600 /25.0;
 }
 
 float AXP192Component::GetBatCoulombOut()
 {
-    uint32_t ReData = Read32bit( 0xB4 );
+    uint32_t ReData = Read32bit( Registers::BATTERY_DISCHARGE_COULUMB_COUNTER_32BIT_BASE );
     return ReData * 65536 * 0.5 / 3600 /25.0;
 }
 
 void AXP192Component::SetCoulombClear()
 {
-    WriteByte(0xB8,0x20);
+    WriteByte(Registers::BATTERY_COULUMB_COUNTER_CONTROL,0x20);
 }
 
 void AXP192Component::SetLDO2( bool State )
 {
-    uint8_t buf = Read8bit(0x12);
+    uint8_t buf = Read8bit(Registers::DCDC13_LDO23_CONTROL);
     if( State == true )
     {
         buf = (1<<2) | buf;
@@ -1208,12 +1153,12 @@ void AXP192Component::SetLDO2( bool State )
     {
         buf = ~(1<<2) & buf;
     }
-    WriteByte( 0x12 , buf );
+    WriteByte( Registers::DCDC13_LDO23_CONTROL , buf );
 }
 
 void AXP192Component::SetLDO3(bool State)
 {
-    uint8_t buf = Read8bit(0x12);
+    uint8_t buf = Read8bit(Registers::DCDC13_LDO23_CONTROL);
     if( State == true )
     {
         buf = (1<<3) | buf;
@@ -1222,24 +1167,24 @@ void AXP192Component::SetLDO3(bool State)
     {
         buf = ~(1<<3) & buf;
     }
-    WriteByte( 0x12 , buf );
+    WriteByte( Registers::DCDC13_LDO23_CONTROL , buf );
 }
 
 void AXP192Component::SetChargeCurrent(uint8_t current)
 {
-    uint8_t buf = Read8bit(0x33);
+    uint8_t buf = Read8bit(Registers::CHARGE_CONTROL_REG1);
     buf = (buf & 0xf0) | (current & 0x07);
-    WriteByte(0x33, buf);
+    Write1Byte(Registers::CHARGE_CONTROL_REG1, buf);
 }
 
 void AXP192Component::PowerOff()
 {
-    WriteByte(0x32, Read8bit(0x32) | 0x80);
+    WriteByte(Registers::POWEROFF_BATTERY_CHLED_CONTROL, Read8bit(Registers::POWEROFF_BATTERY_CHLED_CONTROL) | 0x80);
 }
 
 void AXP192Component::SetAdcState(bool state)
 {
-    WriteByte(0x82, state ? 0xff : 0x00);
+    WriteByte(Registers::ADC_ENABLE_REGISTER1, state ? 0xff : 0x00);
 }
 
 std::string AXP192Component::GetStartupReason() {

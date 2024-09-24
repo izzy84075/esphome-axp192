@@ -42,7 +42,7 @@ namespace detail {
 }  // namespace detail
 
 // 9.11.1
-enum class RegisterLocations : uint8_t {
+enum class Registers : uint8_t {
   POWER_SUPPLY_STATUS = 0x00,
   POWER_SUPPLY_CHARGE_STATUS = 0x01,
   ACIN_VBUS_STATUS = 0x04,
@@ -99,46 +99,63 @@ enum class RegisterLocations : uint8_t {
   IRQ_STATUS_REGISTER2 = 0x45,
   IRQ_STATUS_REGISTER3 = 0x46,
   IRQ_STATUS_REGISTER4 = 0x47,
-  ACIN_VOLTAGE_HIGH8 = 0x56,
-  ACIN_VOLTAGE_LOW4 = 0x57,
-  ACIN_CURRENT_HIGH8 = 0x58,
-  ACIN_CURRENT_LOW4 = 0x59,
-  VBUS_VOLTAGE_HIGH8 = 0x5A,
-  VBUS_VOLTAGE_LOW4 = 0x5B,
-  VBUS_CURRENT_HIGH8 = 0x5C,
-  VBUS_CURRENT_LOW4 = 0x5D,
-  AXP_TEMP_HIGH8 = 0x5E,
-  AXP_TEMP_LOW4 = 0x5F,
-  BATTERY_TEMP_HIGH8 = 0x62,
-  BATTERY_TEMP_LOW4 = 0x63,
-  GPIO0_VOLTAGE_HIGH8 = 0x64,
-  GPIO0_VOLTAGE_LOW4 = 0x65,
-  GPIO1_VOLTAGE_HIGH8 = 0x66,
-  GPIO1_VOLTAGE_LOW4 = 0x67,
-  GPIO2_VOLTAGE_HIGH8 = 0x68,
-  GPIO2_VOLTAGE_LOW4 = 0x69,
-  GPIO3_VOLTAGE_HIGH8 = 0x6A,
-  GPIO3_VOLTAGE_LOW4 = 0x6B,
-  BATTERY_POWER_HIGH8 = 0x70,
-  BATTERY_POWER_MIDDLE8 = 0x71,
-  BATTERY_POWER_LOW8 = 0x72,
-  BATTERY_VOLTAGE_HIGH8 = 0x78,
-  BATTERY_VOLTAGE_LOW4 = 0x79,
-  BATTERY_CHARGE_CURRENT_HIGH8 = 0x7A,
-  BATTERY_CHARGE_CURRENT_LOW5 = 0x7B,
-  BATTERY_DISCHARGE_CURRENT_HIGH8 = 0x7C,
-  BATTERY_DISCHARGE_CURRENT_LOW5 = 0x7D,
-  APS_VOLTAGE_HIGH8 = 0x7E,
-  APS_VOLTAGE_LOW4 = 0x7F,
-  BATTERY_CHARGE_COULUMB_COUNTER3 = 0xB0,
-  BATTERY_CHARGE_COULUMB_COUNTER2 = 0xB1,
-  BATTERY_CHARGE_COULUMB_COUNTER1 = 0xB2,
-  BATTERY_CHARGE_COULUMB_COUNTER0 = 0xB3,
-  BATTERY_DISCHARGE_COULUMB_COUNTER3 = 0xB4,
-  BATTERY_DISCHARGE_COULUMB_COUNTER2 = 0xB5,
-  BATTERY_DISCHARGE_COULUMB_COUNTER1 = 0xB6,
-  BATTERY_DISCHARGE_COULUMB_COUNTER0 = 0xB7,
-  BATTERY_COULUMB_COUTER_CONTROL = 0xB8
+  ACIN_VOLTAGE_12BIT_BASE = 0x56,
+  //ACIN_VOLTAGE_HIGH8 = 0x56,
+  //ACIN_VOLTAGE_LOW4 = 0x57,
+  ACIN_CURRENT_12BIT_BASE = 0x58,
+  //ACIN_CURRENT_HIGH8 = 0x58,
+  //ACIN_CURRENT_LOW4 = 0x59,
+  VBUS_VOLTAGE_12BIT_BASE = 0x5A,
+  //VBUS_VOLTAGE_HIGH8 = 0x5A,
+  //VBUS_VOLTAGE_LOW4 = 0x5B,
+  VBUS_CURRENT_12BIT_BASE = 0x5C,
+  //VBUS_CURRENT_HIGH8 = 0x5C,
+  //VBUS_CURRENT_LOW4 = 0x5D,
+  AXP_TEMP_12BIT_BASE = 0x5E,
+  //AXP_TEMP_HIGH8 = 0x5E,
+  //AXP_TEMP_LOW4 = 0x5F,
+  BATTERY_TEMP_12BIT_BASE = 0x62,
+  //BATTERY_TEMP_HIGH8 = 0x62,
+  //BATTERY_TEMP_LOW4 = 0x63,
+  GPIO0_VOLTAGE_12BIT_BASE = 0x64,
+  //GPIO0_VOLTAGE_HIGH8 = 0x64,
+  //GPIO0_VOLTAGE_LOW4 = 0x65,
+  GPIO1_VOLTAGE_12BIT_BASE = 0x66,
+  //GPIO1_VOLTAGE_HIGH8 = 0x66,
+  //GPIO1_VOLTAGE_LOW4 = 0x67,
+  GPIO2_VOLTAGE_12BIT_BASE = 0x68,
+  //GPIO2_VOLTAGE_HIGH8 = 0x68,
+  //GPIO2_VOLTAGE_LOW4 = 0x69,
+  GPIO3_VOLTAGE_12BIT_BASE = 0x6A,
+  //GPIO3_VOLTAGE_HIGH8 = 0x6A,
+  //GPIO3_VOLTAGE_LOW4 = 0x6B,
+  BATTERY_POWER_24BIT_BASE = 0x70,
+  //BATTERY_POWER_HIGH8 = 0x70,
+  //BATTERY_POWER_MIDDLE8 = 0x71,
+  //BATTERY_POWER_LOW8 = 0x72,
+  BATTERY_VOLTAGE_12BIT_BASE = 0x78,
+  //BATTERY_VOLTAGE_HIGH8 = 0x78,
+  //BATTERY_VOLTAGE_LOW4 = 0x79,
+  BATTERY_CHARGE_CURRENT_13BIT_BASE = 0x7A,
+  //BATTERY_CHARGE_CURRENT_HIGH8 = 0x7A,
+  //BATTERY_CHARGE_CURRENT_LOW5 = 0x7B,
+  BATTERY_DISCHARGE_CURRENT_13BIT_BASE = 0x7C,
+  //BATTERY_DISCHARGE_CURRENT_HIGH8 = 0x7C,
+  //BATTERY_DISCHARGE_CURRENT_LOW5 = 0x7D,
+  APS_VOLTAGE_12BIT_BASE = 0x7E,
+  //APS_VOLTAGE_HIGH8 = 0x7E,
+  //APS_VOLTAGE_LOW4 = 0x7F,
+  BATTERY_CHARGE_COULUMB_COUNTER_32BIT_BASE = 0xB0,
+  //BATTERY_CHARGE_COULUMB_COUNTER3 = 0xB0,
+  //BATTERY_CHARGE_COULUMB_COUNTER2 = 0xB1,
+  //BATTERY_CHARGE_COULUMB_COUNTER1 = 0xB2,
+  //BATTERY_CHARGE_COULUMB_COUNTER0 = 0xB3,
+  BATTERY_DISCHARGE_COULUMB_COUNTER_32BIT_BASE = 0xB4,
+  //BATTERY_DISCHARGE_COULUMB_COUNTER3 = 0xB4,
+  //BATTERY_DISCHARGE_COULUMB_COUNTER2 = 0xB5,
+  //BATTERY_DISCHARGE_COULUMB_COUNTER1 = 0xB6,
+  //BATTERY_DISCHARGE_COULUMB_COUNTER0 = 0xB7,
+  BATTERY_COULUMB_COUNTER_CONTROL = 0xB8
 };
 
 enum class OutputPin : uint8_t { OUTPUT_LDO2, OUTPUT_LDO3, OUTPUT_DCDC1, OUTPUT_DCDC3, OUTPUT_LDOIO0, OUTPUT_BACKLIGHT };
@@ -359,9 +376,9 @@ public:
   void configure_battery();
   bool configure_axp();
 
-  bool update_register(RegisterLocations reg, uint8_t value, uint8_t clear_mask);
-  bool load_register(RegisterLocations reg);
-  bool save_register(RegisterLocations reg);
+  bool update_register(Registers reg, uint8_t value, uint8_t clear_mask);
+  bool load_register(Registers reg);
+  bool save_register(Registers reg);
 
 #ifdef USE_BINARY_SENSOR
   void enable_irq(IrqType irq);
@@ -372,7 +389,7 @@ public:
 private:
   static std::string GetStartupReason();
   void publish_helper_(SensorType type, float state);
-  void debug_log_register_(RegisterLocations reg);
+  void debug_log_register_(Registers reg);
 
   void publish_helper_(IrqType type, bool state);
   void publish_helper_(MonitorType type, bool state);
@@ -405,49 +422,49 @@ protected:
     std::map<OutputPin, AXP192Switch *> power_control_{};
   #endif
 
-    std::map<RegisterLocations, uint8_t> registers_{
-      {RegisterLocations::EXTEN_DCDC2_CONTROL, 0x00},              // 9.11.9 (DC-DC2 and external)
-      {RegisterLocations::DCDC13_LDO23_CONTROL, 0xFF},             // 9.11.10 (DC-DC1/3 and LDO2/3 control)
-      {RegisterLocations::DCDC2_VOLTAGE, 0x16},                    // 9.11.11 (DC-DC2 voltage)
-      {RegisterLocations::DCDC1_VOLTAGE, 0x68},                    // 9.11.13 (DC-DC1) voltage
-      {RegisterLocations::DCDC3_VOLTAGE, 0x48},                    // 9.11.14 (DC-DC3) voltage
-      {RegisterLocations::LDO23_VOLTAGE, 0xCF},                    // 9.11.15 (LDO2 LDO3) voltage
-      {RegisterLocations::VBUS_IPSOUT_ACCESS, 0x6F},               // 9.11.16 (vbus hold) voltage
-      {RegisterLocations::VOFF_VOLTAGE, 0xF3},                     // 9.11.17 (power off) voltage
-      {RegisterLocations::POWEROFF_BATTERY_CHLED_CONTROL, 0x46},   // 9.11.18 (battery control)
-      {RegisterLocations::CHARGE_CONTROL_REG1, 0xC8},              // 9.11.19 (charge control)
-      {RegisterLocations::BATTERY_BACKUP_CONTROL, 0x22},           // 9.11.21 (RTC)
-      {RegisterLocations::PEK_PARAMETERS, 0x5D},                   // 9.11.22 (powerkey)
-      {RegisterLocations::BATTERY_CHARGE_OVERTEMP_VALUE, 0x1F},    // 9.11.25 (temperature protection)
-      {RegisterLocations::IRQ_ENABLE_REGISTER1, 0xD8},             // 9.11.53 (IRQ1 enable)
-      {RegisterLocations::IRQ_ENABLE_REGISTER2, 0xFF},             // 9.11.53 (IRQ1 enable)
-      {RegisterLocations::IRQ_ENABLE_REGISTER3, 0x3B},             // 9.11.53 (IRQ1 enable)
-      {RegisterLocations::IRQ_ENABLE_REGISTER4, 0xC1},             // 9.11.53 (IRQ1 enable)
-      {RegisterLocations::ADC_ENABLE_REGISTER1, 0xFF},             // 9.11.31 (ADC1 control)
-      {RegisterLocations::ADC_ENABLE_REGISTER2, 0xFF},             // 9.11.32 (ADC2 control)
-      {RegisterLocations::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0x33},  // 9.11.33 (ADC1 params)
-      {RegisterLocations::GPIO_30_INPUT_RANGE, 0x00},              // 9.11.34 (ADC2 params)
-      {RegisterLocations::GPIO_CONTROL, 0x07},                     // 9.11.30 (GPIO0 function) LDio0 enable
-      {RegisterLocations::GPIO_LDO_VOLTAGE, 0xA0},                 // 9.11.39 (LDio0) voltage
+    std::map<Registers, uint8_t> registers_{
+      {Registers::EXTEN_DCDC2_CONTROL, 0x00},              // 9.11.9 (DC-DC2 and external)
+      {Registers::DCDC13_LDO23_CONTROL, 0xFF},             // 9.11.10 (DC-DC1/3 and LDO2/3 control)
+      {Registers::DCDC2_VOLTAGE, 0x16},                    // 9.11.11 (DC-DC2 voltage)
+      {Registers::DCDC1_VOLTAGE, 0x68},                    // 9.11.13 (DC-DC1) voltage
+      {Registers::DCDC3_VOLTAGE, 0x48},                    // 9.11.14 (DC-DC3) voltage
+      {Registers::LDO23_VOLTAGE, 0xCF},                    // 9.11.15 (LDO2 LDO3) voltage
+      {Registers::VBUS_IPSOUT_ACCESS, 0x6F},               // 9.11.16 (vbus hold) voltage
+      {Registers::VOFF_VOLTAGE, 0xF3},                     // 9.11.17 (power off) voltage
+      {Registers::POWEROFF_BATTERY_CHLED_CONTROL, 0x46},   // 9.11.18 (battery control)
+      {Registers::CHARGE_CONTROL_REG1, 0xC8},              // 9.11.19 (charge control)
+      {Registers::BATTERY_BACKUP_CONTROL, 0x22},           // 9.11.21 (RTC)
+      {Registers::PEK_PARAMETERS, 0x5D},                   // 9.11.22 (powerkey)
+      {Registers::BATTERY_CHARGE_OVERTEMP_VALUE, 0x1F},    // 9.11.25 (temperature protection)
+      {Registers::IRQ_ENABLE_REGISTER1, 0xD8},             // 9.11.53 (IRQ1 enable)
+      {Registers::IRQ_ENABLE_REGISTER2, 0xFF},             // 9.11.53 (IRQ1 enable)
+      {Registers::IRQ_ENABLE_REGISTER3, 0x3B},             // 9.11.53 (IRQ1 enable)
+      {Registers::IRQ_ENABLE_REGISTER4, 0xC1},             // 9.11.53 (IRQ1 enable)
+      {Registers::ADC_ENABLE_REGISTER1, 0xFF},             // 9.11.31 (ADC1 control)
+      {Registers::ADC_ENABLE_REGISTER2, 0xFF},             // 9.11.32 (ADC2 control)
+      {Registers::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0x33},  // 9.11.33 (ADC1 params)
+      {Registers::GPIO_30_INPUT_RANGE, 0x00},              // 9.11.34 (ADC2 params)
+      {Registers::GPIO_CONTROL, 0x07},                     // 9.11.30 (GPIO0 function) LDio0 enable
+      {Registers::GPIO_LDO_VOLTAGE, 0xA0},                 // 9.11.39 (LDio0) voltage
   };
 
-  std::unordered_map<RegisterLocations, uint8_t> register_masks_{
-      {RegisterLocations::DCDC13_LDO23_CONTROL, 0b11110000},
-      {RegisterLocations::EXTEN_DCDC2_CONTROL, 0b11111010},
-      {RegisterLocations::DCDC2_VOLTAGE, 0b11000000},
-      {RegisterLocations::DCDC1_VOLTAGE, 0b10000000},
-      {RegisterLocations::DCDC3_VOLTAGE, 0b10000000},
-      {RegisterLocations::VOFF_VOLTAGE, 0b11111000},
-      {RegisterLocations::POWEROFF_BATTERY_CHLED_CONTROL, 0b00000100},
-      {RegisterLocations::BATTERY_BACKUP_CONTROL, 0b00011100},
-      {RegisterLocations::IRQ_ENABLE_REGISTER1, 0b00000001},
-      {RegisterLocations::IRQ_ENABLE_REGISTER3, 0b00000100},
-      {RegisterLocations::IRQ_ENABLE_REGISTER4, 0b00000010},
-      {RegisterLocations::ADC_ENABLE_REGISTER2, 0b01111000},
-      {RegisterLocations::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0b00001000},
-      {RegisterLocations::GPIO_30_INPUT_RANGE, 0b11110000},
-      {RegisterLocations::GPIO_CONTROL, 0b11110000},
-      {RegisterLocations::GPIO_LDO_VOLTAGE, 0b00001111},
+  std::unordered_map<Registers, uint8_t> register_masks_{
+      {Registers::DCDC13_LDO23_CONTROL, 0b11110000},
+      {Registers::EXTEN_DCDC2_CONTROL, 0b11111010},
+      {Registers::DCDC2_VOLTAGE, 0b11000000},
+      {Registers::DCDC1_VOLTAGE, 0b10000000},
+      {Registers::DCDC3_VOLTAGE, 0b10000000},
+      {Registers::VOFF_VOLTAGE, 0b11111000},
+      {Registers::POWEROFF_BATTERY_CHLED_CONTROL, 0b00000100},
+      {Registers::BATTERY_BACKUP_CONTROL, 0b00011100},
+      {Registers::IRQ_ENABLE_REGISTER1, 0b00000001},
+      {Registers::IRQ_ENABLE_REGISTER3, 0b00000100},
+      {Registers::IRQ_ENABLE_REGISTER4, 0b00000010},
+      {Registers::ADC_ENABLE_REGISTER2, 0b01111000},
+      {Registers::ADC_SAMPLE_FREQUENCY_TS_CONTROL, 0b00001000},
+      {Registers::GPIO_30_INPUT_RANGE, 0b11110000},
+      {Registers::GPIO_CONTROL, 0b11110000},
+      {Registers::GPIO_LDO_VOLTAGE, 0b00001111},
   };
 
 
@@ -516,14 +533,14 @@ protected:
 
     void PowerOff();
 
-    void WriteByte( RegisterLocations reg , uint8_t data);
-    uint8_t Read8bit( RegisterLocations reg );
-    uint16_t Read12bit( RegisterLocations reg );
-    uint16_t Read13bit( RegisterLocations reg );
-    uint16_t Read16bit( RegisterLocations reg );
-    uint32_t Read24bit( RegisterLocations reg );
-    uint32_t Read32bit( RegisterLocations reg );
-    void ReadBuf( RegisterLocations reg , uint8_t length, uint8_t *output );
+    void WriteByte( Registers reg , uint8_t data);
+    uint8_t Read8bit( Registers reg );
+    uint16_t Read12bit( Registers reg );
+    uint16_t Read13bit( Registers reg );
+    uint16_t Read16bit( Registers reg );
+    uint32_t Read24bit( Registers reg );
+    uint32_t Read32bit( Registers reg );
+    void ReadBuf( Registers reg , uint8_t length, uint8_t *output );
 };
 
 }
