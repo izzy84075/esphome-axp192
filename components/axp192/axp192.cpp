@@ -281,6 +281,9 @@ bool AXP192Component::update_register(Registers reg, uint8_t value, uint8_t clea
   regvalue |= value;
   WriteByte(reg, regvalue);
 
+  ESP_LOGD(this->get_component_source(), "Updated %s to 0x%02X", detail::format_bits(regvalue).c_str(),
+              detail::to_int(reg));
+
   //And save it into the temp register, too, if applicable
   auto location = this->registers_.find(reg);
   if (location != this->registers_.end()) {
@@ -299,6 +302,8 @@ bool AXP192Component::load_register(Registers reg) {
   if (contents.has_value()) {
     location->second = contents.value();
     ESP_LOGVV(this->get_component_source(), "Read %s from 0x%02X", detail::format_bits(location->second).c_str(),
+              detail::to_int(reg));
+    ESP_LOGD(this->get_component_source(), "Read %s from 0x%02X", detail::format_bits(location->second).c_str(),
               detail::to_int(reg));
   }
   return contents.has_value();
@@ -319,6 +324,8 @@ bool AXP192Component::save_register(Registers reg) {
   base |= location->second;
   if (this->write_byte(detail::to_int(reg), base)) {
     ESP_LOGVV(this->get_component_source(), "Wrote %s to 0x%02X", detail::format_bits(base).c_str(),
+              detail::to_int(reg));
+    ESP_LOGD(this->get_component_source(), "Wrote %s to 0x%02X", detail::format_bits(base).c_str(),
               detail::to_int(reg));
     return true;
   }
